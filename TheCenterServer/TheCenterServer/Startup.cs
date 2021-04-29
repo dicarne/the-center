@@ -38,6 +38,17 @@ namespace TheCenterServer
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
             });
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyHeader()
+                                    .AllowAnyMethod()
+                                    .SetIsOriginAllowed((host) => true)
+                                    .AllowCredentials();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,9 +61,9 @@ namespace TheCenterServer
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TheCenterServer v1"));
             }
-            
-            app.UseRouting();
 
+            app.UseRouting();
+            app.UseCors();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
