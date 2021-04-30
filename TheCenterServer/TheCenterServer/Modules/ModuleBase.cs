@@ -2,16 +2,20 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
-namespace TheCenterServer.Module
+namespace TheCenterServer.PModule
 {
     public class ModuleBase
     {
         Dictionary<string, UIControl> controls = new();
-        Dictionary<string, System.Reflection.MethodInfo> methods = new();
+        Dictionary<string, MethodInfo> methods = new();
         public ModuleBase()
         {
-            var UIs = this.GetType().GetProperties().Where(p => p.GetType().IsSubclassOf(typeof(UIControl)));
+            var type = this.GetType();
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+                         BindingFlags.Instance;
+            var UIs = type.GetFields(flags).Where(p => p.GetValue(this).GetType().IsSubclassOf(typeof(UIControl)));
             foreach (var ui in UIs)
             {
                 var attr = ui.GetCustomAttributes(typeof(UIAttribute), true).FirstOrDefault();
@@ -22,7 +26,7 @@ namespace TheCenterServer.Module
                     controls.Add(ins.Id, ins);
                 }
             }
-            var funs = this.GetType().GetMethods().Where(p => p.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault() != null);
+            var funs = this.GetType().GetMethods(flags).Where(p => p.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault() != null);
             foreach (var item in funs)
             {
                 var a = item.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault();
@@ -51,7 +55,7 @@ namespace TheCenterServer.Module
             return new List<UICom>();
         }
 
-        public async Task HandleEvent(string control, string eventname, List<string> args = null)
+        public object HandleEvent(string control, string eventname, string[] args = null)
         {
             if (controls.TryGetValue(control, out var ins))
             {
@@ -61,10 +65,11 @@ namespace TheCenterServer.Module
                     var method = eventbind.method;
                     if (methods.TryGetValue(method, out var minfo))
                     {
-                        minfo.Invoke(this, args.ToArray());
+                        return minfo.Invoke(this, args);
                     }
                 }
             }
+            return null;
         }
     }
 }
