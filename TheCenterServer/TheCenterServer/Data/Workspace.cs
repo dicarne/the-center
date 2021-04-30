@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace TheCenterServer
 {
-    public class Workspace
+    public class WorkspaceDesc
     {
         public string WName { get; set; }
-        public List<Board> Boards { get; set; }
+        public List<BoardDesc> Boards { get; set; }
     }
 
-    public class Board
+    public class BoardDesc
     {
         public string CardType { get; set; }
         public string CName { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace TheCenterServer.PModule
 {
+	[PModule("runscript")]
 	public class RunScript : ModuleBase
 	{
 		[UI("runBtn")]
