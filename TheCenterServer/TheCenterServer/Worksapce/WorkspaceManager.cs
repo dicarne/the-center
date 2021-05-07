@@ -6,7 +6,7 @@ namespace TheCenterServer
 {
 	public class WorkspaceManager
 	{
-		public List<Workspace> Workspaces = new List<Workspace>();
+		public List<Workspace> Workspaces = new();
 
 		/// <summary>
 		/// 创建一个新的工作空间
@@ -20,6 +20,7 @@ namespace TheCenterServer
 				desc = new WorkspaceDesc()
 				{
 					WName = workname,
+					Id = Guid.NewGuid().ToString(),
 					// TODO 模板
 					Boards = new List<BoardDesc>()
 				}
@@ -29,15 +30,15 @@ namespace TheCenterServer
 			return newwk;
 		}
 
-		public void Delete(string workname)
+		public void Delete(string workid)
 		{
-			var index = Workspaces.FindIndex(w => w.desc.WName == workname);
+			var index = Workspaces.FindIndex(w => w.desc.Id == workid);
 			if (index != -1) Workspaces.RemoveAt(index);
 		}
 
-		public Workspace Get(string workname)
+		public Workspace Get(string workid)
 		{
-			return Workspaces.Find(w => w.desc.WName == workname);
+			return Workspaces.Find(w => w.desc.Id == workid);
 		}
 	}
 

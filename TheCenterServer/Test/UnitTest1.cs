@@ -5,18 +5,19 @@ using System.Threading.Tasks;
 
 namespace Test
 {
-	public class UnitTest1
-	{
-		public UnitTest1() { 
-		
-		}
+    public class UnitTest1
+    {
+        public UnitTest1()
+        {
 
-		[Fact]
-		public void Test1()
-		{
-			var m = new RunScript();
-			var ret = m.HandleEvent("runBtn", "onclick");
-			Assert.Equal("RUN!", ret as string);
-		}
-	}
+        }
+
+        [Fact]
+        public void Test1()
+        {
+            var m = new RunScript();
+            var ret = m.HandleEvent("runBtn", "onclick", new[] { "python" });
+            Assert.Equal("RUN!python", ret as string);
+        }
+    }
 }

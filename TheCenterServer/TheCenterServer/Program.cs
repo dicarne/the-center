@@ -13,7 +13,7 @@ namespace TheCenterServer
     {
         public static void Main(string[] args)
         {
-            var m = new ModuleManager();
+            _ = new ModuleManager();
             CreateHostBuilder(args).Build().Run();
         }
 

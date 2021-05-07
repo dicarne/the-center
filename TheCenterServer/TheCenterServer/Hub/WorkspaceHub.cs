@@ -32,16 +32,16 @@ namespace TheCenterServer
             return "Hello SingalR!";
         }
 
-        public async Task<List<Board>> GetBoards(string workspace)
+        public async Task<List<BoardDesc>> GetBoards(string workspace)
         {
-            return new List<Board>(){
-                new Board(){
+            return new List<BoardDesc>(){
+                new BoardDesc(){
                     CName="Card1",
                     CardType="C1",
                     W=8,
                     Id="1"
                 },
-                 new Board(){
+                 new BoardDesc(){
                     CName="Card2",
                     CardType="C2",
                     W=8,

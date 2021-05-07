@@ -7,7 +7,6 @@ namespace TheCenterServer
 	public class UIControl
 	{
 		public UICom UI { get; protected set; }
-		public List<string> Event => UI.Event;
 		public List<EventBind> EventBind { get; set; }
 		public string Id { get => UI.Id; set { UI.Id = value; } }
 		public UIControl(List<EventBind> Event)

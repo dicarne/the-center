@@ -45,20 +45,21 @@ namespace TheCenterServer.PModule
 			}
 		}
 
-		public async virtual Task OnLoad()
-		{
+        public virtual Task OnLoad()
+        {
+            return Task.CompletedTask;
+        }
 
-		}
-		public async virtual Task OnDestroy()
-		{
+        public virtual Task OnDestroy()
+        {
+            return Task.CompletedTask;
+        }
 
-		}
-
-		/// <summary>
-		/// 提供给前端UI描述信息。
-		/// </summary>
-		/// <returns></returns>
-		public virtual List<UICom> BuildInterface()
+        /// <summary>
+        /// 提供给前端UI描述信息。
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<UICom> BuildInterface()
 		{
 			return new List<UICom>();
 		}

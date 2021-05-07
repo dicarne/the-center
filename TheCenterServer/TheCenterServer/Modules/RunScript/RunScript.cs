@@ -3,31 +3,29 @@ using System.Collections.Generic;
 
 namespace TheCenterServer.PModule
 {
-	[PModule("runscript")]
-	public class RunScript : ModuleBase
-	{
-		[UI("runBtn")]
-		ButtonControl runButton = new ButtonControl(Event: new List<EventBind>() { new EventBind("onclick", "run") });
-		public RunScript()
-		{
-			runButton.UI.W = 10;
-			runButton.UI.H = 30;
-		}
+    [PModule("runscript")]
+    public class RunScript : ModuleBase
+    {
+        [UI("runBtn")]
+        ButtonControl runButton = new(Event: new List<EventBind>() { new("onclick", "run") });
+
+        public RunScript()
+        {
+        }
 
 
-		[Method("run")]
-		string Run()
-		{
-			Console.WriteLine("RUN!");
-			return "RUN!";
-		}
+        [Method("run")]
+        string Run(string content)
+        {
+            return "RUN!" + content;
+        }
 
-		public override List<UICom> BuildInterface()
-		{
-			return new List<UICom>()
-			{
-				runButton.UI
-			};
-		}
-	}
+        public override List<UICom> BuildInterface()
+        {
+            return new List<UICom>()
+            {
+                runButton.UI
+            };
+        }
+    }
 }
