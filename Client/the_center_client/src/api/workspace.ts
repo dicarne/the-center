@@ -2,6 +2,7 @@ import { HubConnectionState } from "@microsoft/signalr";
 import { onUnmounted } from "vue";
 import { connection, call_after_connected } from "../connection/Server";
 
+
 export function onConnected(action: () => void) {
   let complete = false;
   let act = () => {

@@ -9,7 +9,6 @@ namespace TheCenterServer
 {
     public class WorkspaceHub : Hub
     {
-        Dictionary<string, string> Current = new Dictionary<string, string>();
         public async Task SendMessageToBoard(string workspace, string boardID, string data)
         {
             await Clients.All.SendAsync("ReceiveBoard", workspace, boardID, data);
@@ -18,18 +17,11 @@ namespace TheCenterServer
         public async override Task OnConnectedAsync()
         {
             Console.WriteLine(Context.ConnectionId);
-            Current.Add(Context.ConnectionId, "");
         }
 
         public async override Task OnDisconnectedAsync(Exception? e)
         {
-            Console.WriteLine($"ID {Context.ConnectionId}, {e}");
-            Current.Remove(Context.ConnectionId);
-        }
-
-        public async Task<string> SayHello()
-        {
-            return "Hello SingalR!";
+            focusWorkspace.Remove(Context.ConnectionId);
         }
 
         public List<BoardUI> GetBoards(string workspace)
@@ -82,6 +74,24 @@ namespace TheCenterServer
             var module = ModuleManager.Ins.WorkspaceManager.Get(arg.wk).modules.Find(b => b.ID == arg.bd);
             var res = module.HandleUIEvent(arg.ui, arg.e, arg.arg);
             return res;
+        }
+
+        public void FocusWorkspace(string workspaceid)
+        {
+            if (focusWorkspace.TryGetValue(Context.ConnectionId, out var old))
+            {
+                old.ConnectID = null;
+            }
+            var sp = ModuleManager.Ins.WorkspaceManager.Get(workspaceid);
+            sp.ConnectID = Context.ConnectionId;
+            focusWorkspace.Add(Context.ConnectionId, sp);
+        }
+
+        Dictionary<string, Workspace> focusWorkspace = new Dictionary<string, Workspace>();
+
+        public void SendToClient(string connectID, string workspace, string board, string data)
+        {
+            Clients.Client(connectID).SendAsync("HandleServer", workspace, board, data);
         }
     }
 }

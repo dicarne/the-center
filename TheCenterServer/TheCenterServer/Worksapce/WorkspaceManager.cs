@@ -46,6 +46,7 @@ namespace TheCenterServer
     {
         public WorkspaceDesc desc;
         public List<ModuleBase> modules = new();
+        public string ConnectID { get; set; }
         public void Init()
         {
             foreach (var b in desc.Boards)
