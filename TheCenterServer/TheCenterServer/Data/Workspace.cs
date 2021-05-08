@@ -22,7 +22,7 @@ namespace TheCenterServer
         public string CName { get; set; }
         public string Id { get; set; }
         public Dictionary<string, string> Prop { get; set; }
-        public int W { get; set; } = 12;
+        public int W { get; set; } = 6;
         public int H { get; set; } = 1;
     }
 

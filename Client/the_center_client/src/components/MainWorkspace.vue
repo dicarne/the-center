@@ -1,20 +1,31 @@
 <template>
-    <Button @click="getboard()">刷新</Button>
-    <Row>
-        <Col>
-            <a-button @click="createBoard">+</a-button>
+    <div class="main-work-area">
+        <Button @click="getboard()">刷新</Button>
+    </div>
+
+    <Row :gutter="[16, 16]">
+        <Col :span="6">
+            <div class="card-board card-body">
+                <a-button @click="createBoard">+</a-button>
+            </div>
         </Col>
         <Col v-for="item in list" :key="item.id" :span="item.w">
-            <Card>
-                <BoardElement v-for="ui in item.uIComs" :key="ui.id" :ui="ui" :workspace="workspace" :board="item.id"/>
-            </Card>
+            <div class="card-board card-body">
+                <BoardElement
+                    v-for="ui in item.uIComs"
+                    :key="ui.id"
+                    :ui="ui"
+                    :workspace="workspace"
+                    :board="item.id"
+                />
+            </div>
         </Col>
     </Row>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { Row, Col, Button, Card } from "ant-design-vue";
+import { Row, Col, Button } from "ant-design-vue";
 import { BoardUI, CreateBoard, GetBoards, onConnected } from "../api/workspace";
 import BoardElement from "./BoardElement.vue"
 
@@ -23,7 +34,6 @@ export default defineComponent({
         Row,
         Col,
         Button,
-        Card,
         BoardElement
     },
     props: {
@@ -50,4 +60,19 @@ export default defineComponent({
 });
 </script>
 
-<style></style>
+<style>
+.main-work-area {
+    padding-bottom: 10px;
+}
+.card-body{
+    background-color: #fff;
+    padding: 24px;
+}
+.card-board {
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px #e6e6e6;
+}
+.card-board:hover {
+    box-shadow: 0px 0px 10px #d3d3d3;
+}
+</style>

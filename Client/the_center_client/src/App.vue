@@ -22,7 +22,7 @@
             </a-menu>
         </a-layout-sider>
     </a-layout>
-    <a-layout :style="{ marginLeft: '50px' }">
+    <a-layout :style="{ marginLeft: '50px', minHeight: '100vh' }">
         <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
             <MainWorkspace v-if="currentWorkspace != null && currentWorkspace != 'home'" :workspace="currentWorkspace" :key="currentWorkspace"></MainWorkspace>
         </a-layout-content>
