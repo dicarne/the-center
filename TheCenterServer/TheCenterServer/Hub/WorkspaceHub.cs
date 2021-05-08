@@ -1,7 +1,7 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
@@ -38,7 +38,7 @@ namespace TheCenterServer
             var list = new List<BoardUI>();
             for (int i = 0; i < space.desc.Boards.Count; i++)
             {
-                list.Add(BoardUI.From(space.desc.Boards[i], 
+                list.Add(BoardUI.From(space.desc.Boards[i],
                     space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
             }
             return list;
@@ -66,6 +66,22 @@ namespace TheCenterServer
                 return false;
             }
             return true;
+        }
+
+        public class HandleEventArg
+        {
+            public string wk { get; set; }
+            public string bd { get; set; }
+            public string ui { get; set; }
+            public string e { get; set; }
+            public string[] arg { get; set; }
+        }
+        public object HandleEvent(string argstr)
+        {
+            HandleEventArg arg = JsonSerializer.Deserialize<HandleEventArg>(argstr);
+            var module = ModuleManager.Ins.WorkspaceManager.Get(arg.wk).modules.Find(b => b.ID == arg.bd);
+            var res = module.HandleUIEvent(arg.ui, arg.e, arg.arg);
+            return res;
         }
     }
 }

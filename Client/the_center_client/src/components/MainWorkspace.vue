@@ -1,16 +1,22 @@
 <template>
     <Button @click="getboard()">刷新</Button>
     <Row>
+        <Col>
+            <a-button @click="createBoard">+</a-button>
+        </Col>
         <Col v-for="item in list" :key="item.id" :span="item.w">
-            <Card title="c">{{ item.cName }}</Card>
+            <Card>
+                <BoardElement v-for="ui in item.uIComs" :key="ui.id" :ui="ui" :workspace="workspace" :board="item.id"/>
+            </Card>
         </Col>
     </Row>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { Row, Col, Button, Card } from "ant-design-vue";
-import { Board, GetBoards, onConnected } from "../api/workspace";
+import { BoardUI, CreateBoard, GetBoards, onConnected } from "../api/workspace";
+import BoardElement from "./BoardElement.vue"
 
 export default defineComponent({
     components: {
@@ -18,6 +24,7 @@ export default defineComponent({
         Col,
         Button,
         Card,
+        BoardElement
     },
     props: {
         workspace: {
@@ -29,13 +36,16 @@ export default defineComponent({
         },
     },
     setup: (prop) => {
-        const list = ref([] as Board[]);
+        const list = ref([] as BoardUI[]);
         const getboard = async () => {
             list.value = await GetBoards(prop.workspace);
         };
         onConnected(() => getboard());
-
-        return { getboard, list };
+        const createBoard = async () => {
+            await CreateBoard(prop.workspace, "runscript")
+            await getboard()
+        }
+        return { getboard, list, createBoard, workspace: prop.workspace };
     },
 });
 </script>

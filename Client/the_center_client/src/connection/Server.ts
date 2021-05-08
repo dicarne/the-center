@@ -2,7 +2,7 @@ import { HubConnectionBuilder } from "@microsoft/signalr";
 
 export const connection = new HubConnectionBuilder()
     .withUrl("http://localhost:5000/workspace")
-    //.withAutomaticReconnect()
+    .withAutomaticReconnect()
     .build();
 
 export const call_after_connected: (() => void)[] = [];

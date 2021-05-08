@@ -16,7 +16,7 @@ namespace Test
         public void Test1()
         {
             var m = new RunScript();
-            var ret = m.HandleEvent("runBtn", "onclick", new[] { "python" });
+            var ret = m.HandleUIEvent("runBtn", "onclick", new[] { "python" });
             Assert.Equal("RUN!python", ret as string);
         }
     }

@@ -71,7 +71,7 @@ namespace TheCenterServer.PModule
 		/// <param name="eventname"></param>
 		/// <param name="args"></param>
 		/// <returns></returns>
-		public object HandleEvent(string control, string eventname, string[] args = null)
+		public object HandleUIEvent(string control, string eventname, string[] args = null)
 		{
 			if (controls.TryGetValue(control, out var ins))
 			{

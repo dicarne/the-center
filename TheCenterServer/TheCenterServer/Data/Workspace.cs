@@ -28,7 +28,7 @@ namespace TheCenterServer
 
     public class BoardUI: BoardDesc
     {
-        public List<UICom> uIComs;
+        public List<UICom> uIComs { get; set; }
         public static BoardUI From(BoardDesc desc, List<UICom> uis)
         {
             var bd = new BoardUI() { CardType = desc.CardType, CName = desc.CName, H = desc.H, Id = desc.Id, Prop = desc.Prop, W = desc.W, uIComs = uis };
