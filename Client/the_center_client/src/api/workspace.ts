@@ -61,6 +61,10 @@ export async function HandleBoardUIEvent(
   }));
 }
 
+export async function FocusWorkspace(workspace:string) {
+  return (await connection.invoke("FocusWorkspace", workspace))
+}
+
 export interface Board {
   cardType: string;
   cName: string;

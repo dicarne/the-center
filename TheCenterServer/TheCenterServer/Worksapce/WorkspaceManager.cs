@@ -57,6 +57,7 @@ namespace TheCenterServer
                 {
                     b.Id = Guid.NewGuid().ToString();
                 }
+                m.Workspace = this;
                 m.ID = b.Id;
                 modules.Add(m);
             }
@@ -67,6 +68,7 @@ namespace TheCenterServer
             var m = ModuleManager.Ins.BuildFrom(type);
             m.ID = Guid.NewGuid().ToString();
             modules.Add(m);
+            m.Workspace = this;
             desc.Boards.Add(new BoardDesc() { CardType = type, Id = m.ID });
         }
     }

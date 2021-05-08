@@ -9,6 +9,11 @@ namespace TheCenterServer
 {
     public class WorkspaceHub : Hub
     {
+        public WorkspaceHub()
+        {
+            Ins = this;
+        }
+        public static WorkspaceHub Ins { get; set; }
         public async Task SendMessageToBoard(string workspace, string boardID, string data)
         {
             await Clients.All.SendAsync("ReceiveBoard", workspace, boardID, data);

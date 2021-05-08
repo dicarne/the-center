@@ -19,4 +19,22 @@ namespace TheCenterServer
 			};
 		}
 	}
+
+	public class Text : UICom
+	{
+		
+	}
+
+	public class TextControl : UIControl
+	{
+		public TextControl(string text) : base(new())
+		{
+			UI = new Text()
+			{
+				type = "text",
+				Event = new(),
+			};
+			UI.Prop.Add("text", text);
+		}
+	}
 }

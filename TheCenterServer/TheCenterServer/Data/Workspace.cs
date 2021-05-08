@@ -41,7 +41,7 @@ namespace TheCenterServer
         public string Id { get; set; }
         public string type { get; set; }
         public Dictionary<string, string> Style { get; set; }
-        public Dictionary<string, string> Prop { get; set; }
+        public Dictionary<string, string> Prop { get; set; } = new Dictionary<string, string>();
         public List<string> Event { get; set; }
     }
 

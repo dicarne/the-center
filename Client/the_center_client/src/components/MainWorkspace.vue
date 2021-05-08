@@ -24,10 +24,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 import { Row, Col, Button } from "ant-design-vue";
-import { BoardUI, CreateBoard, GetBoards, onConnected } from "../api/workspace";
+import { BoardUI, CreateBoard, FocusWorkspace, GetBoards, onConnected } from "../api/workspace";
 import BoardElement from "./BoardElement.vue"
+import { workspaces } from "../connection/Server"
 
 export default defineComponent({
     components: {
@@ -50,11 +51,27 @@ export default defineComponent({
         const getboard = async () => {
             list.value = await GetBoards(prop.workspace);
         };
-        onConnected(() => getboard());
+        onConnected(async() => {
+            await FocusWorkspace(prop.workspace)
+            await getboard()
+        });
         const createBoard = async () => {
             await CreateBoard(prop.workspace, "runscript")
             await getboard()
         }
+        const dispatchBoard = (board: string, data: string) => {
+            let jdata = JSON.parse(data)
+            let index = list.value.findIndex(u => u.id === board)
+            list.value[index].uIComs = jdata
+        }
+        onMounted(() => {
+            if (prop.workspace != "home") {
+                workspaces.set(prop.workspace, dispatchBoard)
+            }
+        })
+        onUnmounted(() => {
+            workspaces.delete(prop.workspace)
+        })
         return { getboard, list, createBoard, workspace: prop.workspace };
     },
 });
@@ -64,7 +81,7 @@ export default defineComponent({
 .main-work-area {
     padding-bottom: 10px;
 }
-.card-body{
+.card-body {
     background-color: #fff;
     padding: 24px;
 }

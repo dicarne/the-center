@@ -8,6 +8,7 @@ namespace TheCenterServer.PModule
 {
 	public class ModuleBase
 	{
+		public Workspace Workspace { get; set; }
 		public string ID { get; set; }
 		/// <summary>
 		/// 注册控件

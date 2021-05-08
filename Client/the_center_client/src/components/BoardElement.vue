@@ -1,5 +1,6 @@
 <template>
     <a-button v-if="ui.type === 'button'" @click="click">CLICK</a-button>
+    <p v-if="ui.type === 'text'">{{ prop["text"] }}</p>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
@@ -27,9 +28,8 @@ export default defineComponent({
         const ui = prop.ui as UICom
         const click = async () => {
             const ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onclick', ['test'])
-            console.log(ret)
         }
-        return { ui, click }
+        return { ui, click, prop: (ui as any).prop as any }
     },
 })
 </script>

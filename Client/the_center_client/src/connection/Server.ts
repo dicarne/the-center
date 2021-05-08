@@ -33,6 +33,10 @@ connection.on("send", (data) => {
 connection.on(
   "HandleServer",
   (workspace: string, board: string, data: string) => {
-    
+    workspaces.get(workspace)?.(board, data);
   }
 );
+export const workspaces = new Map<
+  string,
+  (board: string, data: string) => void
+>();
