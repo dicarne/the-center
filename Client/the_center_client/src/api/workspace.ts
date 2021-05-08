@@ -23,15 +23,18 @@ export function onConnected(action: () => void) {
         }
     });
 }
-/**
- * TODO
- */
+
+
 export async function GetWorkspaceList() {
-    return await connection.invoke("GetWorkspaceList");
+    return await connection.invoke("GetWorkspaces") as WorkspaceDesc[];
 }
 
 export async function GetBoards(workspace: string) {
     return await connection.invoke("GetBoards", workspace);
+}
+
+export async function CreateWorkspace(name:string) {
+    return await connection.invoke("CreateWorkspace", name) as boolean
 }
 
 export interface Board {
@@ -41,4 +44,13 @@ export interface Board {
     w: number;
     h: number;
     id: string;
+}
+export interface WorkspaceDesc
+{
+    wName:string;
+    id:string;
+    boards: Board[];
+}
+export interface BoardUI extends Board {
+    uIComs: any[]
 }

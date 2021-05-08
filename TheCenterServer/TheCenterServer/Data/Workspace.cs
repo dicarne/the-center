@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
@@ -25,6 +24,16 @@ namespace TheCenterServer
         public Dictionary<string, string> Prop { get; set; }
         public int W { get; set; } = 12;
         public int H { get; set; } = 1;
+    }
+
+    public class BoardUI: BoardDesc
+    {
+        public List<UICom> uIComs;
+        public static BoardUI From(BoardDesc desc, List<UICom> uis)
+        {
+            var bd = new BoardUI() { CardType = desc.CardType, CName = desc.CName, H = desc.H, Id = desc.Id, Prop = desc.Prop, W = desc.W, uIComs = uis };
+            return bd;
+        }
     }
 
     public class UICom

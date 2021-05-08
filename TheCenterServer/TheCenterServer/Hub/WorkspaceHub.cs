@@ -32,22 +32,40 @@ namespace TheCenterServer
             return "Hello SingalR!";
         }
 
-        public async Task<List<BoardDesc>> GetBoards(string workspace)
+        public List<BoardUI> GetBoards(string workspace)
         {
-            return new List<BoardDesc>(){
-                new BoardDesc(){
-                    CName="Card1",
-                    CardType="C1",
-                    W=8,
-                    Id="1"
-                },
-                 new BoardDesc(){
-                    CName="Card2",
-                    CardType="C2",
-                    W=8,
-                    Id="2"
-                }
-            };
+            var space = ModuleManager.Ins.WorkspaceManager.Get(workspace);
+            var list = new List<BoardUI>();
+            for (int i = 0; i < space.desc.Boards.Count; i++)
+            {
+                list.Add(BoardUI.From(space.desc.Boards[i], 
+                    space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
+            }
+            return list;
+        }
+
+        public List<WorkspaceDesc> GetWorkspaces()
+        {
+            return ModuleManager.Ins.WorkspaceManager.Workspaces.Select(w => w.desc).ToList();
+        }
+
+        public bool CreateWorkspace(string name)
+        {
+            ModuleManager.Ins.WorkspaceManager.Create(name);
+            return true;
+        }
+
+        public bool CreateBoard(string wkspace, string bdtype)
+        {
+            try
+            {
+                ModuleManager.Ins.WorkspaceManager.Get(wkspace).CreateBoard(bdtype);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

@@ -13,42 +13,18 @@
                 theme="dark"
                 mode="inline"
                 v-model:selectedKeys="control.selectedKeys"
+                @click="changeWorkspace"
             >
-                <a-menu-item key="1">
-                    <user-outlined />
-                </a-menu-item>
-                <a-menu-item key="2">
-                    <video-camera-outlined />
-                </a-menu-item>
-                <a-menu-item key="3">
-                    <upload-outlined />
-                </a-menu-item>
-                <a-menu-item key="4">
-                    <bar-chart-outlined />
-                </a-menu-item>
-                <a-menu-item key="5">
-                    <cloud-outlined />
-                </a-menu-item>
-                <a-menu-item key="6">
-                    <appstore-outlined />
-                </a-menu-item>
-                <a-menu-item key="7">
-                    <team-outlined />
-                </a-menu-item>
-                <a-menu-item key="8">
-                    <shop-outlined />
+                <a-button @click="createWorkspace">+</a-button>
+                <a-menu-item :key="item.id" v-for="item in workspaces">
+                    <p>{{ item.id }}</p>
                 </a-menu-item>
             </a-menu>
         </a-layout-sider>
     </a-layout>
     <a-layout :style="{ marginLeft: '50px' }">
-        <a-layout-content
-            :style="{ margin: '24px 16px 0', overflow: 'initial' }"
-        >
-            <MainWorkspace
-                v-if="currentWorkspace != null"
-                :workspace="currentWorkspace"
-            />
+        <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
+            <MainWorkspace v-if="currentWorkspace != null && currentWorkspace != 'home'" :workspace="currentWorkspace"></MainWorkspace>
         </a-layout-content>
     </a-layout>
 </template>
@@ -66,7 +42,7 @@ import {
     TeamOutlined,
     ShopOutlined,
 } from "@ant-design/icons-vue";
-import { onConnected } from "./api/workspace";
+import { GetWorkspaceList, onConnected, WorkspaceDesc, CreateWorkspace } from "./api/workspace";
 export default defineComponent({
     name: "App",
     components: {
@@ -83,17 +59,37 @@ export default defineComponent({
     },
     setup: () => {
         const currentWorkspace = ref(null as string | null);
-        onConnected(() => {
-            currentWorkspace.value = "TEST";
+        const workspaces = ref<null | WorkspaceDesc[]>(null);
+
+        const getWorkspace = async () => {
+            workspaces.value = await GetWorkspaceList();
+        }
+        onConnected(async () => {
+            currentWorkspace.value = "home";
+            await getWorkspace();
         });
 
         const control = reactive({
-            selectedKeys: ["1"]
+            selectedKeys: []
         })
+
+        const createWorkspace = async () => {
+            const ret = await CreateWorkspace("test");
+            if (ret) {
+                await getWorkspace();
+            }
+        }
+
+        const changeWorkspace = (e: any) => {
+            currentWorkspace.value = e.key;
+        }
 
         return {
             currentWorkspace,
-            control
+            control,
+            workspaces,
+            createWorkspace,
+            changeWorkspace
         };
     },
 });

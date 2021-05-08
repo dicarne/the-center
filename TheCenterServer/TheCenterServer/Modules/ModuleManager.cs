@@ -10,8 +10,10 @@ namespace TheCenterServer
 	{
 		public static ModuleManager Ins { get; private set; }
 		public ModuleManager() { Ins = this; Init(); }
+		public WorkspaceManager WorkspaceManager;
 		public void Init() {
 			ScanAssembly(Assembly.GetExecutingAssembly());
+			WorkspaceManager = new();
 		}
 		public void ScanAssembly(Assembly assembly) {
 			var modules = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)));
