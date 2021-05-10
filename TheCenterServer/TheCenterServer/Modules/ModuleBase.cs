@@ -151,6 +151,10 @@ namespace TheCenterServer.PModule
             Dirt = false;
         }
         bool Dirt { get; set; }
+        protected void SyncUI()
+        {
+            WorkspaceBackgroundService.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.Id, ID, BuildInterface());
+        }
         protected void SetState(Action action)
         {
             action();
@@ -186,8 +190,17 @@ namespace TheCenterServer.PModule
             {
                 if (needPersist.TryGetValue(item.Key, out var ptype))
                 {
-                    var obj = JsonSerializer.Deserialize(item.Value, ptype.PropertyType);
-                    ptype.SetValue(this, obj);
+                    try
+                    {
+                        var obj = JsonSerializer.Deserialize(item.Value, ptype.PropertyType);
+                        ptype.SetValue(this, obj);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        Console.WriteLine($"[IGNORE] {item.Key}");
+                    }
+
                 }
                 else
                 {

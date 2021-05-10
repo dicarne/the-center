@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace TheCenterServer.PModule
 {
@@ -15,24 +17,69 @@ namespace TheCenterServer.PModule
         Button runBtn = new(onClick: "Run");
 
         [UI]
-        Text resText = new("YES!");
+        Text resText = new("");
 
         [Persistence]
-        public bool result { get; set; } = false;
+        public string result { get; set; } = "";
 
         [Persistence]
         public string scriptPath { get; set; } = "";
+
+        public override Task OnLoad()
+        {
+            SetState(() =>
+            {
+                result = "";
+            });
+            return Task.CompletedTask;
+        }
 
         [Method]
         string Run(string content)
         {
             SetState(() =>
             {
-                result = true;
-
+                result = "";
+                SyncUI();
             });
-            WorkspaceHub.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.Id, ID, BuildInterface());
-            return "RUN!" + content;
+            Process pro = new Process();
+            pro.StartInfo.FileName = scriptPath;
+            pro.StartInfo.UseShellExecute = false;
+            pro.StartInfo.CreateNoWindow = true;
+            pro.StartInfo.RedirectStandardOutput = true;
+            pro.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+            {
+                SetState(() =>
+                {
+                    result += e.Data + "\n";
+                    Console.WriteLine($"[data] {result}");
+                    try
+                    {
+                        SyncUI();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Write(e);
+                    }
+
+                });
+            };
+            try
+            {
+                pro.Start();
+                pro.BeginOutputReadLine();
+            }
+            catch (Exception e)
+            {
+                SetState(() =>
+                {
+                    result = e.ToString();
+                    SyncUI();
+                });
+            }
+
+
+            return "[runscript] " + content;
         }
 
         [Method]
@@ -51,7 +98,7 @@ namespace TheCenterServer.PModule
                 scriptPathUI.text(scriptPath),
                 runBtn
             };
-            if (result) ui.Add(resText);
+            if (result != "") ui.Add(resText.text(result));
             return ui;
         }
     }

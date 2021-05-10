@@ -13,7 +13,7 @@
             <div class="card-board card-body">
                 <BoardElement
                     v-for="ui in item.uIComs"
-                    :key="ui.id"
+                    :key="ui.id + JSON.stringify(item.ver)"
                     :ui="ui"
                     :workspace="workspace"
                     :board="item.id"
@@ -50,8 +50,9 @@ export default defineComponent({
         const list = ref([] as BoardUI[]);
         const getboard = async () => {
             list.value = await GetBoards(prop.workspace);
+            list.value.forEach(u => u.ver = 0)
         };
-        onConnected(async() => {
+        onConnected(async () => {
             await FocusWorkspace(prop.workspace)
             await getboard()
         });
@@ -62,7 +63,8 @@ export default defineComponent({
         const dispatchBoard = (board: string, data: string) => {
             let jdata = JSON.parse(data)
             let index = list.value.findIndex(u => u.id === board)
-            list.value[index].uIComs = jdata
+            list.value[index].uIComs = ref(jdata)
+            list.value[index].ver++
         }
         onMounted(() => {
             if (prop.workspace != "home") {

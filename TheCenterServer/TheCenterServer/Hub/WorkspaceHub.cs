@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace TheCenterServer
 {
@@ -38,7 +41,6 @@ namespace TheCenterServer
                 list.Add(BoardUI.From(space.desc.Boards[i],
                     space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
             }
-            Console.WriteLine(JsonSerializer.Serialize(list));
             return list;
         }
 
@@ -94,7 +96,6 @@ namespace TheCenterServer
         }
 
         Dictionary<string, Workspace> focusWorkspace = new Dictionary<string, Workspace>();
-
         public void SendUIToClient(string connectID, string workspace, string board, object data)
         {
             Clients.Client(connectID).SendAsync("HandleServer", workspace, board, JsonSerializer.Serialize(data, new JsonSerializerOptions()
@@ -102,5 +103,38 @@ namespace TheCenterServer
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             }));
         }
+
+
     }
+
+    public class WorkspaceBackgroundService : IHostedService
+    {
+        public static WorkspaceBackgroundService Ins { get; private set; }
+        private readonly ILogger _logger;
+        readonly IHubContext<WorkspaceHub> hub;
+        public WorkspaceBackgroundService(ILogger<WorkspaceBackgroundService> logger, IHubContext<WorkspaceHub> hubContext)
+        {
+            _logger = logger;
+            hub = hubContext;
+            Ins = this;
+        }
+        public void SendUIToClient(string connectID, string workspace, string board, object data)
+        {
+            hub.Clients.Client(connectID).SendAsync("HandleServer", workspace, board, JsonSerializer.Serialize(data, new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            }));
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
 }

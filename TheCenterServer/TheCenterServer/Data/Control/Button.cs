@@ -30,5 +30,10 @@ namespace TheCenterServer
 			};
 			UI.Prop.Add("text", text);
 		}
+		public Text text(string? newtext)
+		{
+			UI!.Prop["text"] = newtext;
+			return this;
+		}
 	}
 }

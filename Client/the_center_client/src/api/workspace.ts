@@ -80,6 +80,7 @@ export interface WorkspaceDesc {
 }
 export interface BoardUI extends Board {
   uIComs: UICom[];
+  ver: number;
 }
 export interface UICom {
   id: string;
