@@ -3,48 +3,62 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using LiteDB;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace TheCenterServer.PModule
 {
-	public class ModuleBase
-	{
-		public Workspace Workspace { get; set; }
-		public string ID { get; set; }
-		/// <summary>
-		/// 注册控件
-		/// </summary>
-		Dictionary<string, UIControl> controls = new();
+    public class ModuleBase
+    {
+        public Workspace Workspace { get; set; }
+        public string ID { get; set; }
+        /// <summary>
+        /// 注册控件
+        /// </summary>
+        Dictionary<string, UIControl> controls = new();
 
-		/// <summary>
-		/// 注册函数
-		/// </summary>
-		Dictionary<string, MethodInfo> methods = new();
-		public ModuleBase()
-		{
-			var type = this.GetType();
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
-						 BindingFlags.Instance;
-			var UIs = type.GetFields(flags).Where(p => p.GetValue(this).GetType().IsSubclassOf(typeof(UIControl)));
-			foreach (var ui in UIs)
-			{
-				var attr = ui.GetCustomAttributes(typeof(UIAttribute), true).FirstOrDefault();
-				if (attr != null && attr is UIAttribute ua)
-				{
-					var ins = ui.GetValue(this) as UIControl;
-					ins.Id = ua.name;
-					controls.Add(ins.Id, ins);
-				}
-			}
-			var funs = this.GetType().GetMethods(flags).Where(p => p.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault() != null);
-			foreach (var item in funs)
-			{
-				var a = item.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault();
-				if (a is MethodAttribute ma)
-				{
-					methods.Add(ma.name, item);
-				}
-			}
-		}
+        /// <summary>
+        /// 注册函数
+        /// </summary>
+        Dictionary<string, MethodInfo> methods = new();
+
+        Dictionary<string, PropertyInfo> needPersist = new();
+        public ModuleBase()
+        {
+            var type = this.GetType();
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+                         BindingFlags.Instance;
+            var UIs = type.GetFields(flags).Where(p => p.GetValue(this).GetType().IsSubclassOf(typeof(UIControl)));
+            foreach (var ui in UIs)
+            {
+                var attr = ui.GetCustomAttributes(typeof(UIAttribute), true).FirstOrDefault();
+                if (attr != null && attr is UIAttribute ua)
+                {
+                    var ins = ui.GetValue(this) as UIControl;
+                    ins.Id = ua.name;
+                    controls.Add(ins.Id, ins);
+                }
+            }
+            var funs = type.GetMethods(flags).Where(p => p.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault() != null);
+            foreach (var item in funs)
+            {
+                var a = item.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault();
+                if (a is MethodAttribute ma)
+                {
+                    methods.Add(ma.name, item);
+                }
+            }
+            var persists = type.GetProperties(flags).Where(p => p.GetCustomAttribute(typeof(PersistenceAttribute), true) != null);
+            foreach (var p in persists)
+            {
+                needPersist.Add(p.Name, p);
+            }
+        }
+
+        public virtual void OnFirstCreate()
+        {
+
+        }
 
         public virtual Task OnLoad()
         {
@@ -61,45 +75,125 @@ namespace TheCenterServer.PModule
         /// </summary>
         /// <returns></returns>
         public virtual List<UICom> BuildInterface()
-		{
-			return new List<UICom>();
-		}
+        {
+            return new List<UICom>();
+        }
 
-		/// <summary>
-		/// 分发控件事件
-		/// </summary>
-		/// <param name="control"></param>
-		/// <param name="eventname"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		public object HandleUIEvent(string control, string eventname, string[] args = null)
-		{
-			if (controls.TryGetValue(control, out var ins))
-			{
-				var eventbind = ins.EventBind.FirstOrDefault(e => e.eventname == eventname);
-				if (eventbind != null)
-				{
-					var method = eventbind.method;
-					if (methods.TryGetValue(method, out var minfo))
-					{
-						return minfo.Invoke(this, args);
-					}
-				}
-			}
-			return null;
-		}
+        /// <summary>
+        /// 分发控件事件
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="eventname"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public object HandleUIEvent(string control, string eventname, string[] args = null)
+        {
+            if (controls.TryGetValue(control, out var ins))
+            {
+                var eventbind = ins.EventBind.FirstOrDefault(e => e.eventname == eventname);
+                if (eventbind != null)
+                {
+                    var method = eventbind.method;
+                    if (methods.TryGetValue(method, out var minfo))
+                    {
+                        return minfo.Invoke(this, args);
+                    }
+                }
+            }
+            return null;
+        }
 
-	}
+        class ModuleSaveData
+        {
+            public ObjectId _id { get; set; }
+            public string workspace { get; set; }
+            public string board { get; set; }
+            public string data { get; set; }
+        }
 
-	[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-	sealed class PModuleAttribute : Attribute
-	{
+        public void Save()
+        {
+            var db = WorkspaceManager.DB;
+            var col = db.GetCollection<ModuleSaveData>("ModuleData");
+            col.EnsureIndex(d => d.board);
+            var old = col.FindOne(c => c.board == ID);
+            if (old != null)
+            {
+                old.data = GetSaveData();
+                col.Update(old);
+            }
+            else
+            {
+                col.Insert(new ModuleSaveData()
+                {
+                    workspace = Workspace.desc.Id,
+                    board = ID,
+                    data = GetSaveData()
+                });
+            }
+            Dirt = false;
+        }
+        bool Dirt { get; set; }
+        protected void SetDirt()
+        {
+            Dirt = true;
+            Save();
+        }
+        string GetSaveData()
+        {
+            var dic = new Dictionary<string, string>();
+            foreach (var p in needPersist)
+            {
+                dic.Add(p.Key, JsonSerializer.Serialize(p.Value.GetValue(this)));
+            }
+            return JsonSerializer.Serialize(dic);
+        }
 
-		public PModuleAttribute(string moduleType)
-		{
-			ModuleType = moduleType;
+        public void Recovery()
+        {
+            var db = WorkspaceManager.DB;
+            var col = db.GetCollection<ModuleSaveData>("ModuleData");
+            var old = col.FindOne(c => c.workspace == Workspace.desc.Id && c.board == ID);
+            if (old == null)
+            {
+                Console.WriteLine($"[WARN] 找不到{Workspace.desc.Id}.{ID}的记录。");
+                return;
+            }
+            var data = JsonSerializer.Deserialize<Dictionary<string, string>>(old.data);
+            foreach (var item in data)
+            {
+                if (needPersist.TryGetValue(item.Key, out var ptype))
+                {
+                    var obj = JsonSerializer.Deserialize(item.Value, ptype.PropertyType);
+                    ptype.SetValue(this, obj);
+                }
+                else
+                {
+                    Console.WriteLine($"[WARN] 找不到{Workspace.desc.Id}.{ID}.{item.Key}的记录。");
+                }
+            }
+        }
 
-		}
-		public string ModuleType { get; set; }
-	}
+    }
+
+    [System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    public class PModuleAttribute : Attribute
+    {
+
+        public PModuleAttribute(string moduleType)
+        {
+            ModuleType = moduleType;
+
+        }
+        public string ModuleType { get; set; }
+    }
+
+    [System.AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = true)]
+    public class PersistenceAttribute : Attribute
+    {
+        public PersistenceAttribute()
+        {
+
+        }
+    }
 }

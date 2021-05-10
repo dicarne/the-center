@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace TheCenterServer
@@ -13,6 +14,10 @@ namespace TheCenterServer
 		{
 			EventBind = Event ?? new List<EventBind>();
 		}
+		public static implicit operator UICom(UIControl ctrl)
+        {
+			return ctrl.UI;
+        }
 	}
 
 

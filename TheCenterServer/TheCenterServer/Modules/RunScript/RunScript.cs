@@ -12,30 +12,27 @@ namespace TheCenterServer.PModule
 
         [UI("resText")]
         TextControl resText = new("YES!");
-        public RunScript()
-        {
-        }
 
+        [Persistence]
+        public bool result { get; set; } = false;
 
         [Method("run")]
         string Run(string content)
         {
-            WorkspaceHub.Ins.SendToClient(Workspace.ConnectID, Workspace.desc.Id, ID, JsonSerializer.Serialize(new List<UICom>()
-            {
-                runButton.UI,
-                resText.UI
-            }, new JsonSerializerOptions() { 
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            }));
+            result = true;
+            WorkspaceHub.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.Id, ID, BuildInterface());
+            SetDirt();
             return "RUN!" + content;
         }
 
         public override List<UICom> BuildInterface()
         {
-            return new List<UICom>()
+            var ui = new List<UICom>()
             {
-                runButton.UI
+                runButton
             };
+            if (result) ui.Add(resText);
+            return ui;
         }
     }
 }

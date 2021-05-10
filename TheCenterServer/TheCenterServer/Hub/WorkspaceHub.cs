@@ -94,9 +94,12 @@ namespace TheCenterServer
 
         Dictionary<string, Workspace> focusWorkspace = new Dictionary<string, Workspace>();
 
-        public void SendToClient(string connectID, string workspace, string board, string data)
+        public void SendUIToClient(string connectID, string workspace, string board, object data)
         {
-            Clients.Client(connectID).SendAsync("HandleServer", workspace, board, data);
+            Clients.Client(connectID).SendAsync("HandleServer", workspace, board, JsonSerializer.Serialize(data, new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            }));
         }
     }
 }

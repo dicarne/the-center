@@ -6,14 +6,16 @@ using TheCenterServer.PModule;
 
 namespace TheCenterServer
 {
-	public class ModuleManager
+	public class ModuleManager: IDisposable
 	{
 		public static ModuleManager Ins { get; private set; }
 		public ModuleManager() { Ins = this; Init(); }
 		public WorkspaceManager WorkspaceManager;
+		
 		public void Init() {
 			ScanAssembly(Assembly.GetExecutingAssembly());
 			WorkspaceManager = new();
+			WorkspaceManager.Recovery();
 		}
 		public void ScanAssembly(Assembly assembly) {
 			var modules = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ModuleBase)));
@@ -30,5 +32,10 @@ namespace TheCenterServer
 			var t = moduleLibrary[type];
 			return Activator.CreateInstance(t) as ModuleBase;
 		}
-	}
+
+        public void Dispose()
+        {
+			WorkspaceManager.Dispose();
+        }
+    }
 }
