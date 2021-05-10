@@ -38,6 +38,7 @@ namespace TheCenterServer
                 list.Add(BoardUI.From(space.desc.Boards[i],
                     space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
             }
+            Console.WriteLine(JsonSerializer.Serialize(list));
             return list;
         }
 

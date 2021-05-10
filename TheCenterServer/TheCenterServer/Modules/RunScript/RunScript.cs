@@ -9,10 +9,10 @@ namespace TheCenterServer.PModule
     {
 
         [UI]
-        InputField scriptPathUI = new("", onChange: "OnChange");
+        InputField scriptPathUI = new("", placeholder: "½Å±¾Â·¾¶".UTF8(), onChange: "OnChange");
 
         [UI]
-        Button runBtn = new(onclick: "Run");
+        Button runBtn = new(onClick: "Run");
 
         [UI]
         Text resText = new("YES!");
@@ -21,7 +21,7 @@ namespace TheCenterServer.PModule
         public bool result { get; set; } = false;
 
         [Persistence]
-        public string? scriptPath { get; set; }
+        public string scriptPath { get; set; } = "";
 
         [Method]
         string Run(string content)
@@ -29,6 +29,7 @@ namespace TheCenterServer.PModule
             SetState(() =>
             {
                 result = true;
+
             });
             WorkspaceHub.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.Id, ID, BuildInterface());
             return "RUN!" + content;

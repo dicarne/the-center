@@ -1,9 +1,12 @@
 <template>
-    <a-button v-if="ui.type === 'button'" @click="click">CLICK</a-button>
-    <p v-if="ui.type === 'text'">{{ prop["text"] }}</p>
+    <div class="board-element">
+        <a-button v-if="ui.type === 'button'" @click="click">CLICK</a-button>
+        <p v-if="ui.type === 'text'">{{ textvalue }}</p>
+        <a-input v-if="ui.type === 'input'" v-model:value="textvalue" @change="onTextChange" :placeholder="uiProp['placeholder']"></a-input>
+    </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { HandleBoardUIEvent, UICom } from "../api/workspace"
 
 export default defineComponent({
@@ -27,11 +30,20 @@ export default defineComponent({
     setup: (prop) => {
         const ui = prop.ui as UICom
         const click = async () => {
-            const ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onclick', ['test'])
+            const ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onClick', ['test'])
         }
-        return { ui, click, prop: (ui as any).prop as any }
+
+        const uiProp = (ui as any).prop as any
+        const textvalue = ref(uiProp['text'])
+        const onTextChange = async () => {
+            await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onChange', [textvalue.value])
+        }
+        return { ui, click, textvalue, onTextChange, uiProp }
     },
 })
 </script>
 <style>
+.board-element {
+    margin: 10px;
+}
 </style>

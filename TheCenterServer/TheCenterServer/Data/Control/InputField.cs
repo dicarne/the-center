@@ -5,13 +5,14 @@ namespace TheCenterServer
 {
     public class InputField : UIControl
     {
-        public InputField(string text, string? onChange = null) : base()
+        public InputField(string text, string? onChange = null, string? placeholder = null) : base()
         {
             UI = new UICom()
             {
-                type = "inputfield"
+                type = "input"
             };
             UI.Prop.Add("text", text);
+            if (placeholder != null) UI.Prop.Add("placeholder", placeholder);
 
             var events = new List<EventBind>();
             if (onChange != null) events.Add(new("onChange", onChange));

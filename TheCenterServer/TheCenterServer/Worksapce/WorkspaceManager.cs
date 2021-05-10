@@ -144,16 +144,24 @@ namespace TheCenterServer
 
         public void CreateBoard(string type)
         {
-            var m = ModuleManager.Ins.BuildFrom(type);
-            m.ID = Guid.NewGuid().ToString();
-            modules.Add(m);
-            m.Workspace = this;
+            try
+            {
+                var m = ModuleManager.Ins.BuildFrom(type);
+                m.ID = Guid.NewGuid().ToString();
+                modules.Add(m);
+                m.Workspace = this;
 
-            desc.Boards.Add(new BoardDesc() { CardType = type, Id = m.ID });
-            m.OnFirstCreate();
-            m.OnLoad();
-            m.Save();
-            ModuleManager.Ins.WorkspaceManager.Save();
+                desc.Boards.Add(new BoardDesc() { CardType = type, Id = m.ID });
+                m.OnFirstCreate();
+                m.OnLoad();
+                m.Save();
+                ModuleManager.Ins.WorkspaceManager.Save();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
         }
 
         public ModuleBase? TryFindModule(string moduleType)
