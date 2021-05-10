@@ -12,6 +12,7 @@ namespace TheCenterServer.PModule
     {
         public Workspace Workspace { get; set; }
         public string ID { get; set; }
+        public string Type { get; private set; }
         /// <summary>
         /// 注册控件
         /// </summary>
@@ -28,15 +29,27 @@ namespace TheCenterServer.PModule
             var type = this.GetType();
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
                          BindingFlags.Instance;
+            var typeattr = type.GetCustomAttribute<PModuleAttribute>(false);
+            if (typeattr == null)
+            {
+                Console.WriteLine("[ERR] 类型名称不能为空。");
+            }
+            else
+            {
+                Type = typeattr.ModuleType;
+            }
+
             var UIs = type.GetFields(flags).Where(p => p.GetValue(this).GetType().IsSubclassOf(typeof(UIControl)));
             foreach (var ui in UIs)
             {
                 var attr = ui.GetCustomAttributes(typeof(UIAttribute), true).FirstOrDefault();
                 if (attr != null && attr is UIAttribute ua)
                 {
-                    var ins = ui.GetValue(this) as UIControl;
-                    ins.Id = ua.name;
-                    controls.Add(ins.Id, ins);
+                    if (ui.GetValue(this) is UIControl ins)
+                    {
+                        ins.Id = ua.name ?? ui.Name;
+                        controls.Add(ins.Id, ins);
+                    }
                 }
             }
             var funs = type.GetMethods(flags).Where(p => p.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault() != null);
@@ -45,7 +58,7 @@ namespace TheCenterServer.PModule
                 var a = item.GetCustomAttributes(typeof(MethodAttribute), true).FirstOrDefault();
                 if (a is MethodAttribute ma)
                 {
-                    methods.Add(ma.name, item);
+                    methods.Add(ma.name ?? item.Name, item);
                 }
             }
             var persists = type.GetProperties(flags).Where(p => p.GetCustomAttribute(typeof(PersistenceAttribute), true) != null);
@@ -86,7 +99,7 @@ namespace TheCenterServer.PModule
         /// <param name="eventname"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public object HandleUIEvent(string control, string eventname, string[] args = null)
+        public object? HandleUIEvent(string control, string eventname, string[]? args = null)
         {
             if (controls.TryGetValue(control, out var ins))
             {
@@ -98,6 +111,10 @@ namespace TheCenterServer.PModule
                     {
                         return minfo.Invoke(this, args);
                     }
+                    else
+                    {
+                        Console.WriteLine($"[ERR] 找不到绑定方法{control}.{eventname}.{method}。");
+                    }
                 }
             }
             return null;
@@ -105,10 +122,10 @@ namespace TheCenterServer.PModule
 
         class ModuleSaveData
         {
-            public ObjectId _id { get; set; }
-            public string workspace { get; set; }
-            public string board { get; set; }
-            public string data { get; set; }
+            public ObjectId? _id { get; set; }
+            public string? workspace { get; set; }
+            public string? board { get; set; }
+            public string? data { get; set; }
         }
 
         public void Save()
@@ -134,8 +151,9 @@ namespace TheCenterServer.PModule
             Dirt = false;
         }
         bool Dirt { get; set; }
-        protected void SetDirt()
+        protected void SetState(Action action)
         {
+            action();
             Dirt = true;
             Save();
         }
@@ -159,7 +177,11 @@ namespace TheCenterServer.PModule
                 Console.WriteLine($"[WARN] 找不到{Workspace.desc.Id}.{ID}的记录。");
                 return;
             }
-            var data = JsonSerializer.Deserialize<Dictionary<string, string>>(old.data);
+            var data = JsonSerializer.Deserialize<Dictionary<string, string>>(old.data!);
+            if (data == null)
+            {
+                return;
+            }
             foreach (var item in data)
             {
                 if (needPersist.TryGetValue(item.Key, out var ptype))

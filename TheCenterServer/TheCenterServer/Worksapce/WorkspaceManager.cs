@@ -155,5 +155,10 @@ namespace TheCenterServer
             m.Save();
             ModuleManager.Ins.WorkspaceManager.Save();
         }
+
+        public ModuleBase? TryFindModule(string moduleType)
+        {
+            return modules.Find(m => m.Type == moduleType);
+        }
     }
 }

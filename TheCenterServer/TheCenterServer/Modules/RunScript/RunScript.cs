@@ -7,29 +7,48 @@ namespace TheCenterServer.PModule
     [PModule("runscript")]
     public class RunScript : ModuleBase
     {
-        [UI("runBtn")]
-        ButtonControl runButton = new(Event: new List<EventBind>() { new("onclick", "run") });
 
-        [UI("resText")]
-        TextControl resText = new("YES!");
+        [UI]
+        InputField scriptPathUI = new("", onChange: "OnChange");
+
+        [UI]
+        Button runBtn = new(onclick: "Run");
+
+        [UI]
+        Text resText = new("YES!");
 
         [Persistence]
         public bool result { get; set; } = false;
 
-        [Method("run")]
+        [Persistence]
+        public string? scriptPath { get; set; }
+
+        [Method]
         string Run(string content)
         {
-            result = true;
+            SetState(() =>
+            {
+                result = true;
+            });
             WorkspaceHub.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.Id, ID, BuildInterface());
-            SetDirt();
             return "RUN!" + content;
+        }
+
+        [Method]
+        void OnChange(string newcontent)
+        {
+            SetState(() =>
+            {
+                scriptPath = newcontent;
+            });
         }
 
         public override List<UICom> BuildInterface()
         {
             var ui = new List<UICom>()
             {
-                runButton
+                scriptPathUI.text(scriptPath),
+                runBtn
             };
             if (result) ui.Add(resText);
             return ui;
