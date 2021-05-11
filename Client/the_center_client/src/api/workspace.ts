@@ -15,7 +15,7 @@ export function onConnected(action: () => void) {
   call_after_connected.push(act);
 
   onUnmounted(() => {
-    const ind = call_after_connected.findIndex(act);
+    const ind = call_after_connected.findIndex((a) => act === a);
     if (ind != -1) {
       call_after_connected.splice(ind, 1);
     }
@@ -32,7 +32,7 @@ export async function GetBoards(workspace: string) {
 }
 
 export async function CreateWorkspace(name: string) {
-  return (await connection.invoke("CreateWorkspace", name)) as boolean;
+  return (await connection.invoke("CreateWorkspace", name)) as string;
 }
 
 export async function CreateBoard(workspace: string, boardtype: string) {
@@ -65,6 +65,19 @@ export async function RenameBoard(wk: string, board: string, newname: string) {
     wk,
     board,
     newname
+  )
+}
+
+export async function StopServer() {
+
+  await connection.invoke(
+    "ExitServer"
+  )
+}
+export async function Ping() {
+
+  return await connection.invoke(
+    "Alive"
   )
 }
 

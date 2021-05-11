@@ -56,8 +56,12 @@ namespace TheCenterServer
 #endif
 
             _ = new ModuleManager();
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            Stop = () => host.StopAsync();
+            host.Run();
         }
+
+        public static Action? Stop;
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)

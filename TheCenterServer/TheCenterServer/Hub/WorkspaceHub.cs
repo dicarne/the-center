@@ -54,10 +54,10 @@ namespace TheCenterServer
             return ModuleManager.Ins.WorkspaceManager.Workspaces.Select(w => w.desc).ToList();
         }
 
-        public bool CreateWorkspace(string name)
+        public string CreateWorkspace(string name)
         {
-            ModuleManager.Ins.WorkspaceManager.Create(name);
-            return true;
+            var wk = ModuleManager.Ins.WorkspaceManager.Create(name);
+            return wk.desc.Id;
         }
 
         public bool CreateBoard(string wkspace, string bdtype)
@@ -138,7 +138,13 @@ namespace TheCenterServer
 
         public void ExitServer()
         {
-            Environment.Exit(0);
+            Console.WriteLine("[EXIT]");
+            Program.Stop?.Invoke();
+        }
+
+        public bool Alive()
+        {
+            return true;
         }
     }
 
