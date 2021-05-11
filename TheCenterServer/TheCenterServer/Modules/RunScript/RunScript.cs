@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -35,15 +36,28 @@ namespace TheCenterServer.PModule
         }
 
         [Method]
-        string Run(string content)
+        string Run()
         {
             SetState(() =>
             {
                 result = "";
                 SyncUI();
             });
+            var content = scriptPath;
+            content = content.TrimStart('"');
+            content = content.TrimEnd('"');
+            if (!Directory.Exists(content) && !File.Exists(content))
+            {
+                SetState(() =>
+                {
+                    result = "该路径不存在！";
+                    SyncUI();
+                });
+                return "";
+            }
+
             Process pro = new Process();
-            pro.StartInfo.FileName = scriptPath;
+            pro.StartInfo.FileName = content;
             pro.StartInfo.UseShellExecute = false;
             pro.StartInfo.CreateNoWindow = true;
             pro.StartInfo.RedirectStandardOutput = true;
@@ -79,7 +93,7 @@ namespace TheCenterServer.PModule
             }
 
 
-            return "[runscript] " + content;
+            return "";
         }
 
         [Method]

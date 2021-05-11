@@ -36,7 +36,7 @@ export default defineComponent({
     setup: (prop) => {
         const ui = prop.ui as UICom
         const click = async () => {
-            const ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onClick', ['test'])
+            const ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onClick')
         }
 
         const uiProp = (ui as any).prop as any

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace TheCenterServer.PModule
 {
-    [PModule("opendirfile", "打开文件夹")]
+    [PModule("opendirfile", "打开文件（夹）")]
     public class OpenDirFile : ModuleBase
     {
         [UI]
@@ -23,13 +24,25 @@ namespace TheCenterServer.PModule
         public string result { get; set; } = "";
 
         [Method]
-        string Run(string content)
+        string Run()
         {
             SetState(() =>
             {
                 result = "";
                 SyncUI();
             });
+            var content = scriptPath;
+            content = content.TrimStart('"');
+            content = content.TrimEnd('"');
+            if (!Directory.Exists(content) && !File.Exists(content))
+            {
+                SetState(() =>
+                {
+                    result = "该路径不存在！";
+                    SyncUI();
+                });
+                return "";
+            }
             Process pro = new Process();
             pro.StartInfo.FileName = "explorer";
             pro.StartInfo.Arguments = scriptPath;
@@ -59,6 +72,7 @@ namespace TheCenterServer.PModule
         [Method]
         void OnChange(string newcontent)
         {
+            Console.WriteLine(newcontent);
             SetState(() =>
             {
                 scriptPath = newcontent;

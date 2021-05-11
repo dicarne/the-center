@@ -11,17 +11,15 @@ export function onConnected(action: () => void) {
   };
   if (connection.state === HubConnectionState.Connected) {
     act();
-    return;
-  } else {
-    call_after_connected.push(act);
   }
+  call_after_connected.push(act);
+
   onUnmounted(() => {
-    if (!complete) {
-      const ind = call_after_connected.findIndex(act);
-      if (ind != -1) {
-        call_after_connected.splice(ind, 1);
-      }
+    const ind = call_after_connected.findIndex(act);
+    if (ind != -1) {
+      call_after_connected.splice(ind, 1);
     }
+
   });
 }
 
@@ -69,6 +67,7 @@ export async function HandleBoardUIEvent(
 }
 
 export async function FocusWorkspace(workspace: string) {
+  console.log("focus " + workspace)
   return (await connection.invoke("FocusWorkspace", workspace))
 }
 

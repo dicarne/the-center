@@ -89,7 +89,6 @@ export default defineComponent({
                     break;
             }
         }
-        console.log(title)
         return {
             onClick, title
         }
