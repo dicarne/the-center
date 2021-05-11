@@ -1,15 +1,13 @@
 <template>
     <div class="board-element">
-        <a-button v-if="ui.type === 'button'" @click="click">{{ textvalue }}</a-button>
-        <p
-            v-if="ui.type === 'text'"
-            :class="css(sc('text-align', ['left', 'text-left'], ['right', 'text-right']), 'text')"
-        >{{ textvalue }}</p>
+        <a-button v-if="ui.type === 'button'" @click="click" :style="uiStyle">{{ textvalue }}</a-button>
+        <p v-if="ui.type === 'text'" class="text" :style="uiStyle">{{ textvalue }}</p>
         <a-input
             v-if="ui.type === 'input'"
             v-model:value="textvalue"
             @change="onTextChange"
             :placeholder="uiProp['placeholder']"
+            :style="uiStyle"
         ></a-input>
     </div>
 </template>
@@ -69,7 +67,7 @@ export default defineComponent({
         const onTextChange = async () => {
             await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onChange', [textvalue.value])
         }
-        return { ui, click, textvalue, onTextChange, uiProp, sc, css }
+        return { ui, click, textvalue, onTextChange, uiProp, sc, css, uiStyle }
     },
 })
 </script>
