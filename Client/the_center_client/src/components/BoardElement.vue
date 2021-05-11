@@ -1,9 +1,9 @@
 <template>
     <div class="board-element">
-        <a-button v-if="ui.type === 'button'" @click="click">CLICK</a-button>
+        <a-button v-if="ui.type === 'button'" @click="click">{{ textvalue }}</a-button>
         <p
             v-if="ui.type === 'text'"
-            :class="css(sc('text-align', ['left', 'text-left'], ['right', 'text-right']))"
+            :class="css(sc('text-align', ['left', 'text-left'], ['right', 'text-right']), 'text')"
         >{{ textvalue }}</p>
         <a-input
             v-if="ui.type === 'input'"
@@ -46,7 +46,7 @@ export default defineComponent({
 
         const sc = (propname: string, ...arg: string[][]) => {
             const v = uiStyle[propname]
-            
+
             for (let i = 0; i < arg.length; i++) {
                 const [name, value] = arg[i];
                 if (name == v) return value
@@ -82,5 +82,8 @@ export default defineComponent({
 }
 .text-right {
     text-align: right;
+}
+.text {
+    overflow: auto;
 }
 </style>

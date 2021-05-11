@@ -128,6 +128,18 @@ namespace TheCenterServer.PModule
             public string? data { get; set; }
         }
 
+        public void DeleteData()
+        {
+            var db = WorkspaceManager.DB;
+            var col = db.GetCollection<ModuleSaveData>("ModuleData");
+            col.EnsureIndex(d => d.board);
+            var old = col.FindOne(c => c.board == ID);
+            if(old != null)
+            {
+                col.Delete(old._id);
+            }
+        }
+
         public void Save()
         {
             var db = WorkspaceManager.DB;

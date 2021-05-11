@@ -7,7 +7,7 @@ namespace TheCenterServer
 
 	public class Button : UIControl
 	{
-		public Button(string? onClick = null)
+		public Button(string text, string? onClick = null)
 		{
 			UI = new UICom()
 			{
@@ -16,6 +16,8 @@ namespace TheCenterServer
 			var eventBind = new List<EventBind>();
 			if (onClick != null) eventBind.Add(new("onClick", onClick));
 			EventBind = eventBind;
+
+			UI.Prop.Add("text", text);
 		}
 	}
 

@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
-import MainWorkspace from "./components/MainWorkspace.vue";
+import MainWorkspace from "./pages/MainWorkspace.vue";
 import {
     UserOutlined,
     VideoCameraOutlined,
@@ -47,7 +47,6 @@ export default defineComponent({
     name: "App",
     components: {
         MainWorkspace,
-
         UserOutlined,
         VideoCameraOutlined,
         UploadOutlined,

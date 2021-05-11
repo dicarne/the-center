@@ -14,7 +14,7 @@ namespace TheCenterServer.PModule
         InputField scriptPathUI = new("", placeholder: "脚本路径".UTF8(), onChange: "OnChange");
 
         [UI]
-        Button runBtn = new(onClick: "Run");
+        Button runBtn = new("运行".UTF8(), onClick: "Run");
 
         [UI]
         Text resText = new("", textAlign: TextAlign.left);

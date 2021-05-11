@@ -67,6 +67,18 @@ namespace TheCenterServer
             }
             return true;
         }
+        public bool DeleteBoard(string wkspace, string cardid)
+        {
+            try
+            {
+                ModuleManager.Ins.WorkspaceManager.Get(wkspace).DeleteBoard(cardid);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
 
         public class HandleEventArg
         {

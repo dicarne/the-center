@@ -1,6 +1,6 @@
 <template>
     <div class="main-work-area">
-        <Button @click="getboard()">刷新</Button>
+        <a-button @click="getboard()">刷新</a-button>
     </div>
 
     <Row :gutter="[16, 16]">
@@ -10,32 +10,38 @@
             </div>
         </Col>
         <Col v-for="item in list" :key="item.id" :span="item.w">
-            <div class="card-board card-body">
-                <BoardElement
-                    v-for="ui in item.uIComs"
-                    :key="ui.id + JSON.stringify(item.ver)"
-                    :ui="ui"
-                    :workspace="workspace"
-                    :board="item.id"
-                />
-            </div>
+            <BoardCard
+                :ver="item.ver"
+                :u-i-coms="item.uIComs"
+                :workspace="workspace"
+                :boardid="item.id"
+                :getboard="getboard"
+            />
         </Col>
     </Row>
+    <a-modal title="增加新卡片" v-model:visible="newcard_visiable" @ok="newcard_ok">
+        <a-menu v-model:selectedKeys="createCard.select" @click="createCard.click">
+            <a-menu-item :key="item" v-for="item in createCard.cardTypes">
+                <p>{{ item }}</p>
+            </a-menu-item>
+        </a-menu>
+    </a-modal>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref } from "vue";
-import { Row, Col, Button } from "ant-design-vue";
+import { defineComponent, onMounted, onUnmounted, reactive, ref } from "vue";
+import { Row, Col } from "ant-design-vue";
 import { BoardUI, CreateBoard, FocusWorkspace, GetBoards, onConnected } from "../api/workspace";
-import BoardElement from "./BoardElement.vue"
+import BoardElement from "../components/BoardElement.vue"
+import BoardCard from "./BoardCard.vue"
 import { workspaces } from "../connection/Server"
 
 export default defineComponent({
     components: {
         Row,
         Col,
-        Button,
-        BoardElement
+        BoardElement,
+        BoardCard
     },
     props: {
         workspace: {
@@ -48,6 +54,7 @@ export default defineComponent({
     },
     setup: (prop) => {
         const list = ref([] as BoardUI[]);
+
         const getboard = async () => {
             list.value = await GetBoards(prop.workspace);
             list.value.forEach(u => u.ver = 0)
@@ -61,10 +68,7 @@ export default defineComponent({
             }
 
         });
-        const createBoard = async () => {
-            await CreateBoard(prop.workspace, "runscript")
-            await getboard()
-        }
+
         const dispatchBoard = (board: string, data: string) => {
             let jdata = JSON.parse(data)
             let index = list.value.findIndex(u => u.id === board)
@@ -79,7 +83,30 @@ export default defineComponent({
         onUnmounted(() => {
             workspaces.delete(prop.workspace)
         })
-        return { getboard, list, createBoard, workspace: prop.workspace };
+
+        // 创建卡片
+        const createCard = reactive({
+            cardTypes: [] as string[],
+            select: [] as string[],
+            click: (e: any) => {
+
+            }
+        })
+        const newcard_visiable = ref(false)
+        const newcard_ok = async () => {
+            if (createCard.select.length != 0) {
+                await CreateBoard(prop.workspace, createCard.select[0])
+                await getboard()
+                newcard_visiable.value = false
+            }
+
+        }
+        const createBoard = async () => {
+            newcard_visiable.value = true
+            createCard.cardTypes = ["runscript"]
+        }
+        // ------
+        return { getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard };
     },
 });
 </script>
@@ -95,6 +122,7 @@ export default defineComponent({
 .card-board {
     border-radius: 8px;
     box-shadow: 0px 0px 10px #e6e6e6;
+    position: relative;
 }
 .card-board:hover {
     box-shadow: 0px 0px 10px #d3d3d3;

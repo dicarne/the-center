@@ -44,6 +44,13 @@ export async function CreateBoard(workspace: string, boardtype: string) {
     boardtype
   )) as boolean;
 }
+export async function DeleteBoard(workspace: string, boardid: string) {
+  return (await connection.invoke(
+    "DeleteBoard",
+    workspace,
+    boardid
+  )) as boolean;
+}
 
 export async function HandleBoardUIEvent(
   workspace: string,

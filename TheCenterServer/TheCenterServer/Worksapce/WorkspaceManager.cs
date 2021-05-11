@@ -164,6 +164,19 @@ namespace TheCenterServer
             
         }
 
+        public void DeleteBoard(string id)
+        {
+            var dm = modules.Where(b => b.ID == id);
+            foreach (var item in dm)
+            {
+                item.DeleteData();
+                item.OnDestroy();
+            }
+            modules.RemoveAll(b => b.ID == id);
+            desc.Boards.RemoveAll(b => b.Id == id);
+            ModuleManager.Ins.WorkspaceManager.Save();
+        }
+
         public ModuleBase? TryFindModule(string moduleType)
         {
             return modules.Find(m => m.Type == moduleType);
