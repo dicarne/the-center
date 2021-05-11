@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using TheCenterServer.PModule;
 using LiteDB;
+using System.Reflection;
 
 namespace TheCenterServer
 {
-    public class WorkspaceManager: IDisposable
+    public class WorkspaceManager : IDisposable
     {
         public static string DBPath = @"D://test.db";
         public static LiteDatabase DB;
@@ -63,7 +64,7 @@ namespace TheCenterServer
             var col = db.GetCollection<WorkspaceSaveData>("workspace");
             col.EnsureIndex(d => d.name);
             var old = col.FindOne(w => w.name == "main");
-            if(old != null)
+            if (old != null)
             {
                 Workspaces = old.workspaces.Select(d =>
                 {
@@ -79,7 +80,7 @@ namespace TheCenterServer
                         Console.WriteLine(e);
                         return new Workspace() { desc = d };
                     }
-                    
+
                 }).ToList();
             }
         }
@@ -91,7 +92,7 @@ namespace TheCenterServer
             var col = db.GetCollection<WorkspaceSaveData>("workspace");
             col.EnsureIndex(d => d.name);
             var old = col.FindOne(w => w.name == "main");
-            if(old == null)
+            if (old == null)
             {
                 col.Insert(new WorkspaceSaveData() { name = "main", workspaces = list });
             }
@@ -106,7 +107,7 @@ namespace TheCenterServer
                 {
                     Console.WriteLine(e);
                 }
-                
+
             }
         }
         class WorkspaceSaveData
@@ -137,6 +138,7 @@ namespace TheCenterServer
                 m.ID = b.Id;
 
                 modules.Add(m);
+                m.BoardDesc = b;
                 m.Recovery();
                 m.OnLoad();
             }
@@ -150,8 +152,14 @@ namespace TheCenterServer
                 m.ID = Guid.NewGuid().ToString();
                 modules.Add(m);
                 m.Workspace = this;
-
-                desc.Boards.Add(new BoardDesc() { CardType = type, Id = m.ID });
+                var b = new BoardDesc()
+                {
+                    CardType = type,
+                    Id = m.ID,
+                    CName = m.GetType().GetCustomAttribute<PModuleAttribute>()?.ModuleName ?? "未命名"
+                };
+                desc.Boards.Add(b);
+                m.BoardDesc = b;
                 m.OnFirstCreate();
                 m.OnLoad();
                 m.Save();
@@ -161,7 +169,7 @@ namespace TheCenterServer
             {
                 Console.WriteLine(e);
             }
-            
+
         }
 
         public void DeleteBoard(string id)

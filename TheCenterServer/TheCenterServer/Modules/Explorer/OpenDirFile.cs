@@ -1,38 +1,26 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.Json;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TheCenterServer.PModule
 {
-    [PModule("runscript", "ÔËÐÐ½Å±¾")]
-    public class RunScript : ModuleBase
+    [PModule("opendirfile", "æ‰“å¼€æ–‡ä»¶å¤¹")]
+    public class OpenDirFile : ModuleBase
     {
+        [UI]
+        Input scriptPathUI = new("", placeholder: "æ–‡ä»¶å¤¹è·¯å¾„".UTF8(), onChange: "OnChange");
 
         [UI]
-        Input scriptPathUI = new("", placeholder: "½Å±¾Â·¾¶".UTF8(), onChange: "OnChange");
-
-        [UI]
-        Button runBtn = new("ÔËÐÐ".UTF8(), onClick: "Run");
+        Button runBtn = new("æ‰“å¼€".UTF8(), onClick: "Run");
 
         [UI]
         Text resText = new("", textAlign: TextAlign.left);
 
         [Persistence]
-        public string result { get; set; } = "";
-
-        [Persistence]
         public string scriptPath { get; set; } = "";
-
-        public override Task OnLoad()
-        {
-            SetState(() =>
-            {
-                result = "";
-            });
-            return Task.CompletedTask;
-        }
+        public string result { get; set; } = "";
 
         [Method]
         string Run(string content)
@@ -43,26 +31,12 @@ namespace TheCenterServer.PModule
                 SyncUI();
             });
             Process pro = new Process();
-            pro.StartInfo.FileName = scriptPath;
+            pro.StartInfo.FileName = "explorer";
+            pro.StartInfo.Arguments = scriptPath;
             pro.StartInfo.UseShellExecute = false;
             pro.StartInfo.CreateNoWindow = true;
             pro.StartInfo.RedirectStandardOutput = true;
-            pro.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
-            {
-                SetState(() =>
-                {
-                    result += e.Data + "\n";
-                    try
-                    {
-                        SyncUI();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Write(e);
-                    }
 
-                });
-            };
             try
             {
                 pro.Start();
@@ -79,7 +53,7 @@ namespace TheCenterServer.PModule
             }
 
 
-            return "[runscript] " + content;
+            return "";
         }
 
         [Method]

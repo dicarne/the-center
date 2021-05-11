@@ -1,12 +1,15 @@
 <template>
     <div class="card-board card-body">
-        <BoardElement
-            v-for="ui in uIComs"
-            :key="ui.id + ver"
-            :ui="ui"
-            :workspace="workspace"
-            :board="boardid"
-        />
+        <p class="title">{{ title }}</p>
+        <div style="margin-top: 5px;">
+            <BoardElement
+                v-for="ui in uIComs"
+                :key="ui.id + ver"
+                :ui="ui"
+                :workspace="workspace"
+                :board="boardid"
+            />
+        </div>
     </div>
     <a-dropdown :trigger="['click']" class="close-pos">
         <a class="ant-dropdown-link" @click.prevent>
@@ -22,8 +25,8 @@
     </a-dropdown>
 </template>
 <script lang="ts">
-import { createVNode, defineComponent, PropType } from "vue";
-import { DeleteBoard, UICom } from "../api/workspace";
+import { createVNode, defineComponent, PropType, ref } from "vue";
+import { BoardUI, DeleteBoard, UICom } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { Modal } from "ant-design-vue";
@@ -53,9 +56,14 @@ export default defineComponent({
         getboard: {
             type: Function,
             required: true
+        },
+        board: {
+            type: Object as PropType<BoardUI>,
+            required: true
         }
     },
     setup: (prop) => {
+        const title = ref(prop.board.cName)
         const onClick = (e: any) => {
             switch (e.key) {
                 case "delete":
@@ -81,8 +89,9 @@ export default defineComponent({
                     break;
             }
         }
+        console.log(title)
         return {
-            onClick
+            onClick, title
         }
     },
 })
@@ -92,5 +101,13 @@ export default defineComponent({
     right: 20px;
     top: 15px;
     position: absolute;
+}
+
+.title {
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    font-size: 12px;
+    color: rgb(161, 161, 161);
 }
 </style>

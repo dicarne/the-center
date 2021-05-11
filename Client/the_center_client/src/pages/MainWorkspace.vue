@@ -16,13 +16,14 @@
                 :workspace="workspace"
                 :boardid="item.id"
                 :getboard="getboard"
+                :board="item"
             />
         </Col>
     </Row>
     <a-modal title="增加新卡片" v-model:visible="newcard_visiable" @ok="newcard_ok">
         <a-menu v-model:selectedKeys="createCard.select" @click="createCard.click">
-            <a-menu-item :key="item" v-for="item in createCard.cardTypes">
-                <p>{{ item }}</p>
+            <a-menu-item :key="item.type" v-for="item in createCard.cardTypes">
+                <p>{{ item.name }}</p>
             </a-menu-item>
         </a-menu>
     </a-modal>
@@ -31,7 +32,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, reactive, ref } from "vue";
 import { Row, Col } from "ant-design-vue";
-import { BoardUI, CreateBoard, FocusWorkspace, GetBoards, onConnected } from "../api/workspace";
+import { BoardUI, CreateBoard, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import BoardCard from "./BoardCard.vue"
 import { workspaces } from "../connection/Server"
@@ -56,7 +57,7 @@ export default defineComponent({
         const list = ref([] as BoardUI[]);
 
         const getboard = async () => {
-            list.value = await GetBoards(prop.workspace);
+            list.value = (await GetBoards(prop.workspace)).filter(b => !b.hide);
             list.value.forEach(u => u.ver = 0)
         };
         onConnected(async () => {
@@ -86,7 +87,7 @@ export default defineComponent({
 
         // 创建卡片
         const createCard = reactive({
-            cardTypes: [] as string[],
+            cardTypes: [] as ModuleTypeNamePair[],
             select: [] as string[],
             click: (e: any) => {
 
@@ -103,7 +104,7 @@ export default defineComponent({
         }
         const createBoard = async () => {
             newcard_visiable.value = true
-            createCard.cardTypes = ["runscript"]
+            createCard.cardTypes = await GetAllBoardTypes();
         }
         // ------
         return { getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard };

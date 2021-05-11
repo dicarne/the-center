@@ -85,6 +85,14 @@ export async function GetAPIDoc(): Promise<ApiDoc> {
   return { docs: JSON.parse(await connection.invoke("GetAPIDoc")) }
 }
 
+export interface ModuleTypeNamePair {
+  type: string;
+  name: string;
+}
+export async function GetAllBoardTypes(): Promise<ModuleTypeNamePair[]> {
+  return (await connection.invoke("GetAllBoardType"))
+}
+
 export interface Board {
   cardType: string;
   cName: string;
@@ -101,6 +109,7 @@ export interface WorkspaceDesc {
 export interface BoardUI extends Board {
   uIComs: UICom[];
   ver: number;
+  hide: boolean;
 }
 export interface UICom {
   id: string;

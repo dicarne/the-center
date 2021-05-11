@@ -44,6 +44,11 @@ namespace TheCenterServer
             return list;
         }
 
+        public List<ModuleManager.ModuleTypeNamePair> GetAllBoardType()
+        {
+            return ModuleManager.Ins.GetModules();
+        }
+
         public List<WorkspaceDesc> GetWorkspaces()
         {
             return ModuleManager.Ins.WorkspaceManager.Workspaces.Select(w => w.desc).ToList();

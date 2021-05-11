@@ -11,6 +11,7 @@ namespace TheCenterServer.PModule
     public class ModuleBase
     {
         public Workspace Workspace { get; set; }
+        public BoardDesc BoardDesc { get; set; }
         public string ID { get; set; }
         public string Type { get; private set; }
         /// <summary>
@@ -227,12 +228,13 @@ namespace TheCenterServer.PModule
     public class PModuleAttribute : Attribute
     {
 
-        public PModuleAttribute(string moduleType)
+        public PModuleAttribute(string moduleType, string name)
         {
             ModuleType = moduleType;
-
+            ModuleName = name;
         }
         public string ModuleType { get; set; }
+        public string ModuleName { get; set; }
     }
 
     [System.AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = true)]
