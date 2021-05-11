@@ -135,6 +135,11 @@ namespace TheCenterServer
         {
             ModuleManager.Ins.WorkspaceManager.Get(workspace).SortBoards(newids);
         }
+
+        public void ExitServer()
+        {
+            Environment.Exit(0);
+        }
     }
 
     public class WorkspaceBackgroundService : IHostedService

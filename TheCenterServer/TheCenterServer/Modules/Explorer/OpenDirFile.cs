@@ -78,7 +78,6 @@ namespace TheCenterServer.PModule
         [Method]
         void OnChange(string newcontent)
         {
-            Console.WriteLine(newcontent);
             SetState(() =>
             {
                 scriptPath = newcontent;

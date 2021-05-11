@@ -1,0 +1,24 @@
+{
+  "name": "the_center_desktop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "dicarne",
+  "license": "MIT",
+  "scripts": {
+    "electron": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "the_center_client",
+    "asar": false,
+    "extraResources": [
+      "./server/**",
+      "./web/**"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^12.0.7",
+    "electron-builder": "^22.11.3"
+  }
+}

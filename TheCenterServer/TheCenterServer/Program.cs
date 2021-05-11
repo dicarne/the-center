@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.Net.NetworkInformation;
+using System.Net;
 
 namespace TheCenterServer
 {
@@ -32,7 +34,7 @@ namespace TheCenterServer
             rootCommand.Handler = CommandHandler.Create<string, string?>((dbpath, genapidoc) =>
             {
                 WorkspaceManager.DBPath = dbpath;
-                if (genapidoc != null)
+                if (!string.IsNullOrEmpty(genapidoc))
                 {
                     DocGen.Gen(genapidoc);
                     quit = true;
@@ -43,8 +45,14 @@ namespace TheCenterServer
             rootCommand.Invoke(args);
             if (quit) return;
 
+
+
 #if DEBUG
             DocGen.Gen();
+#else
+            if(PortInUse(5800)) {
+                return;
+            }
 #endif
 
             _ = new ModuleManager();
@@ -63,5 +71,25 @@ namespace TheCenterServer
 #endif
                         .UseStartup<Startup>();
                 });
+
+        public static bool PortInUse(int port)
+        {
+            bool inUse = false;
+
+            IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+            IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
+
+            foreach (IPEndPoint endPoint in ipEndPoints)
+            {
+                if (endPoint.Port == port)
+                {
+                    inUse = true;
+                    break;
+                }
+            }
+            return inUse;
+        }
     }
+
+
 }
