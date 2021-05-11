@@ -58,14 +58,14 @@ export default defineComponent({
         ShopOutlined,
     },
     setup: () => {
-        const currentWorkspace = ref(null as string | null);
+        const currentWorkspace = ref("home");
         const workspaces = ref<null | WorkspaceDesc[]>(null);
 
         const getWorkspace = async () => {
             workspaces.value = await GetWorkspaceList();
         }
+
         onConnected(async () => {
-            currentWorkspace.value = "home";
             await getWorkspace();
         });
 

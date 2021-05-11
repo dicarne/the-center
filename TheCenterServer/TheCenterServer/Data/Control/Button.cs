@@ -19,16 +19,32 @@ namespace TheCenterServer
 		}
 	}
 
-
+	public enum TextAlign
+    {
+		center, left, right
+    }
 	public class Text : UIControl
 	{
-		public Text(string text) : base()
+		public Text(string text, TextAlign textAlign = TextAlign.center) : base()
 		{
 			UI = new UICom()
 			{
 				type = "text",
 			};
 			UI.Prop.Add("text", text);
+            switch (textAlign)
+            {
+                case TextAlign.center:
+                    break;
+                case TextAlign.left:
+					UI.Style.Add("text-align", "left");
+					break;
+                case TextAlign.right:
+					UI.Style.Add("text-align", "right");
+					break;
+                default:
+                    break;
+            }
 		}
 		public Text text(string? newtext)
 		{

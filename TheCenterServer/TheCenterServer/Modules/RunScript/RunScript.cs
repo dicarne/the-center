@@ -17,7 +17,7 @@ namespace TheCenterServer.PModule
         Button runBtn = new(onClick: "Run");
 
         [UI]
-        Text resText = new("");
+        Text resText = new("", textAlign: TextAlign.left);
 
         [Persistence]
         public string result { get; set; } = "";
@@ -52,7 +52,6 @@ namespace TheCenterServer.PModule
                 SetState(() =>
                 {
                     result += e.Data + "\n";
-                    Console.WriteLine($"[data] {result}");
                     try
                     {
                         SyncUI();
@@ -68,6 +67,7 @@ namespace TheCenterServer.PModule
             {
                 pro.Start();
                 pro.BeginOutputReadLine();
+                pro.WaitForExitAsync();
             }
             catch (Exception e)
             {

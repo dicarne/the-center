@@ -53,8 +53,13 @@ export default defineComponent({
             list.value.forEach(u => u.ver = 0)
         };
         onConnected(async () => {
-            await FocusWorkspace(prop.workspace)
-            await getboard()
+            try {
+                await FocusWorkspace(prop.workspace)
+                await getboard()
+            } catch (error) {
+                console.error(error)
+            }
+
         });
         const createBoard = async () => {
             await CreateBoard(prop.workspace, "runscript")

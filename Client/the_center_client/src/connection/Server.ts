@@ -23,7 +23,16 @@ export async function start() {
     setTimeout(start, 5000);
   }
 }
-
+connection.onreconnected((id) => {
+  console.log("reconnect")
+  call_after_connected.forEach((item) => {
+    try {
+      item();
+    } catch (error) {
+      console.error(error);
+    }
+  });
+})
 //connection.onclose(start);
 
 connection.on("send", (data) => {
