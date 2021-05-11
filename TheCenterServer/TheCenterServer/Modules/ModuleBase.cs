@@ -93,6 +93,15 @@ namespace TheCenterServer.PModule
             return new List<UICom>();
         }
 
+
+        /// <summary>
+        /// 主运行入口，通常供其他卡片调用
+        /// </summary>
+        public virtual void Excute()
+        {
+
+        }
+
         /// <summary>
         /// 分发控件事件
         /// </summary>

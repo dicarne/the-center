@@ -57,6 +57,8 @@ namespace TheCenterServer.PModule
             }
 
             Process pro = new Process();
+            var dir = Path.GetDirectoryName(content);
+            pro.StartInfo.WorkingDirectory = dir;
             pro.StartInfo.FileName = content;
             pro.StartInfo.UseShellExecute = false;
             pro.StartInfo.CreateNoWindow = true;
@@ -81,7 +83,7 @@ namespace TheCenterServer.PModule
             {
                 pro.Start();
                 pro.BeginOutputReadLine();
-                pro.WaitForExitAsync();
+                //pro.WaitForExitAsync();
             }
             catch (Exception e)
             {
@@ -94,6 +96,11 @@ namespace TheCenterServer.PModule
 
 
             return "";
+        }
+
+        public override void Excute()
+        {
+            Run();
         }
 
         [Method]

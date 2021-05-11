@@ -23,6 +23,11 @@ namespace TheCenterServer.PModule
         public string scriptPath { get; set; } = "";
         public string result { get; set; } = "";
 
+        public override void Excute()
+        {
+            Run();
+        }
+
         [Method]
         string Run()
         {
@@ -43,6 +48,7 @@ namespace TheCenterServer.PModule
                 });
                 return "";
             }
+            
             Process pro = new Process();
             pro.StartInfo.FileName = "explorer";
             pro.StartInfo.Arguments = scriptPath;
