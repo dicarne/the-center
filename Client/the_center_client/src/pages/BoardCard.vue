@@ -20,13 +20,19 @@
                 <a-menu-item key="delete">
                     <p>删除</p>
                 </a-menu-item>
+                <a-menu-item key="rename">
+                    <p>重命名</p>
+                </a-menu-item>
             </a-menu>
         </template>
     </a-dropdown>
+    <a-modal title="重命名" v-model:visible="menuVisiable.rename" @ok="rename">
+        <a-input v-model:value="rename_value" placeholder="新名称" />
+    </a-modal>
 </template>
 <script lang="ts">
-import { createVNode, defineComponent, PropType, ref } from "vue";
-import { BoardUI, DeleteBoard, UICom } from "../api/workspace";
+import { createVNode, defineComponent, PropType, reactive, ref } from "vue";
+import { BoardUI, DeleteBoard, RenameBoard, UICom } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { Modal } from "ant-design-vue";
@@ -64,6 +70,9 @@ export default defineComponent({
     },
     setup: (prop) => {
         const title = ref(prop.board.cName)
+        const menuVisiable = reactive({
+            rename: false
+        })
         const onClick = (e: any) => {
             switch (e.key) {
                 case "delete":
@@ -82,15 +91,23 @@ export default defineComponent({
 
                         },
                     });
-
                     break;
-
+                case "rename":
+                    menuVisiable.rename = true;
+                    break;
                 default:
                     break;
             }
         }
+
+        const rename_value = ref("")
+        const rename = async () => {
+            await RenameBoard(prop.workspace, prop.boardid, rename_value.value)
+            title.value = rename_value.value
+            menuVisiable.rename = false
+        }
         return {
-            onClick, title
+            onClick, title, menuVisiable, rename, rename_value
         }
     },
 })

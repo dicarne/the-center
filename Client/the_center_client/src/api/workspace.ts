@@ -50,6 +50,16 @@ export async function DeleteBoard(workspace: string, boardid: string) {
   )) as boolean;
 }
 
+export async function RenameBoard(wk: string, board: string, newname: string) {
+
+  await connection.invoke(
+    "RenameBoard",
+    wk,
+    board,
+    newname
+  )
+}
+
 export async function HandleBoardUIEvent(
   workspace: string,
   boardid: string,

@@ -32,7 +32,7 @@ namespace TheCenterServer
             rootCommand.Handler = CommandHandler.Create<string, string?>((dbpath, genapidoc) =>
             {
                 WorkspaceManager.DBPath = dbpath;
-                if(genapidoc != null)
+                if (genapidoc != null)
                 {
                     DocGen.Gen(genapidoc);
                     quit = true;
@@ -55,7 +55,13 @@ namespace TheCenterServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+#if DEBUG
+                        .UseUrls("http://*:5000")
+#else
+                        .UseUrls("http://*:5800")
+#endif
+                        .UseStartup<Startup>();
                 });
     }
 }

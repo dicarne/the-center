@@ -126,6 +126,10 @@ namespace TheCenterServer
             return DocGen.Gen();
         }
 
+        public void RenameBoard(string work, string board, string newname)
+        {
+            ModuleManager.Ins.WorkspaceManager.Get(work).RenameBoard(board, newname);
+        }
     }
 
     public class WorkspaceBackgroundService : IHostedService

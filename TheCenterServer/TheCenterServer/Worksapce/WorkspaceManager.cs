@@ -110,6 +110,8 @@ namespace TheCenterServer
 
             }
         }
+
+        
         class WorkspaceSaveData
         {
             public ObjectId _id { get; set; }
@@ -182,6 +184,12 @@ namespace TheCenterServer
             }
             modules.RemoveAll(b => b.ID == id);
             desc.Boards.RemoveAll(b => b.Id == id);
+            ModuleManager.Ins.WorkspaceManager.Save();
+        }
+
+        public void RenameBoard(string id, string newname)
+        {
+            desc.Boards.Find(d => d.Id == id)!.CName = newname;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
 

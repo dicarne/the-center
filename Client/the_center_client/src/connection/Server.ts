@@ -1,7 +1,7 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
-
+export const dev = import.meta.env.MODE == "development";
 export const connection = new HubConnectionBuilder()
-  .withUrl("http://localhost:5000/workspace")
+  .withUrl(`http://localhost:${dev ? 5000 : 5800}/workspace`)
   .withAutomaticReconnect()
   .build();
 
@@ -33,7 +33,6 @@ connection.onreconnected((id) => {
     }
   });
 })
-//connection.onclose(start);
 
 connection.on("send", (data) => {
   console.log(data);

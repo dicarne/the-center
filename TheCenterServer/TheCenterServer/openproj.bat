@@ -6,8 +6,4 @@ if not defined TAG (
 )
 
 chcp 65001
-start TheCenterServer.sln
-cd TheCenterServer
 dotnet watch
-
-pause
