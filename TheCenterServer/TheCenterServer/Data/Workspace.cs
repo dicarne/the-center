@@ -44,6 +44,8 @@ namespace TheCenterServer
         public Dictionary<string, string?> Style { get; set; } = new();
         public Dictionary<string, string?> Prop { get; set; } = new();
         public List<string> Event { get; set; } = new();
+        public UICom() { }
+        public UICom(string type) { this.type = type; }
     }
 
 }

@@ -68,8 +68,21 @@ export async function HandleBoardUIEvent(
   }));
 }
 
-export async function FocusWorkspace(workspace:string) {
+export async function FocusWorkspace(workspace: string) {
   return (await connection.invoke("FocusWorkspace", workspace))
+}
+
+export interface ApiDoc {
+  docs: ApiDocData[]
+}
+export interface ApiDocData {
+  type: string;
+  styles: any;
+  events: any;
+  param: any;
+}
+export async function GetAPIDoc(): Promise<ApiDoc> {
+  return { docs: JSON.parse(await connection.invoke("GetAPIDoc")) }
 }
 
 export interface Board {

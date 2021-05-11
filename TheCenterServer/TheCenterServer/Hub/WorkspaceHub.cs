@@ -116,6 +116,10 @@ namespace TheCenterServer
             }));
         }
 
+        public string GetAPIDoc()
+        {
+            return DocGen.Gen();
+        }
 
     }
 

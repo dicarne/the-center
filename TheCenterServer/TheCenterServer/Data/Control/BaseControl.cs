@@ -8,23 +8,37 @@ namespace TheCenterServer
     public class UIControl
     {
         public UICom? UI { get; protected set; }
-        List<EventBind> m_eventBind = new();
-        public List<EventBind> EventBind
+        public readonly List<EventBind> EventBind = new();
+        public string Id { get => UI!.Id; set { UI!.Id = value; } }
+        public UIControl bindEvent(string eventName, string? method)
         {
-            get => m_eventBind;
-            set
+            if (method == null)
             {
-                m_eventBind = value;
-                UI!.Event = m_eventBind.Select(e => e.eventname).ToList();
+                EventBind.RemoveAll(e => e.eventname == eventName);
+                UI!.Event.Remove(eventName);
             }
-        }
-        public string Id { get => UI.Id; set { UI.Id = value; } }
-        public UIControl()
-        {
+            else
+            {
+                var old = EventBind.FindIndex(e => e.eventname == eventName);
+                if (old == -1)
+                {
+                    EventBind.Add(new(eventName, method));
+                    UI!.Event.Add(eventName);
+                }
+                else
+                {
+                    EventBind[old] = new(eventName, method);
+                }
+            }
+            return this;
         }
         public static implicit operator UICom(UIControl ctrl)
         {
-            return ctrl.UI;
+            return ctrl.UI!;
+        }
+        public UIControl(string type)
+        {
+            UI = new UICom(type);
         }
     }
 
@@ -52,6 +66,43 @@ namespace TheCenterServer
         public UIAttribute(string? name = null)
         {
             this.name = name;
+        }
+
+    }
+
+    [System.AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    sealed class UIParamAttribute : Attribute
+    {
+        public readonly string Desc;
+        public readonly string? ParamName;
+        public UIParamAttribute(string desc, string? paramName = null)
+        {
+            Desc = desc;
+            ParamName = paramName;
+        }
+
+    }
+    [System.AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    sealed class UIStyleAttribute : Attribute
+    {
+        public readonly string Desc;
+        public readonly string? ParamName;
+        public UIStyleAttribute(string desc, string? paramName = null)
+        {
+            Desc = desc;
+            ParamName = paramName;
+        }
+
+    }
+    [System.AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    sealed class UIEventAttribute : Attribute
+    {
+        public readonly string Desc;
+        public readonly string? ParamName;
+        public UIEventAttribute(string desc, string? paramName = null)
+        {
+            Desc = desc;
+            ParamName = paramName;
         }
 
     }
