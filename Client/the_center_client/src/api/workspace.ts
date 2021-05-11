@@ -50,6 +50,14 @@ export async function DeleteBoard(workspace: string, boardid: string) {
   )) as boolean;
 }
 
+export async function SortBoards(workspace: string, boards: string[]) {
+  return await connection.invoke(
+    "SortBoards",
+    workspace,
+    boards
+  );
+}
+
 export async function RenameBoard(wk: string, board: string, newname: string) {
 
   await connection.invoke(

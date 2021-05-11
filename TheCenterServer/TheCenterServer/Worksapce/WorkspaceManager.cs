@@ -197,5 +197,16 @@ namespace TheCenterServer
         {
             return modules.Find(m => m.Type == moduleType);
         }
+
+        public void SortBoards(List<string> newids)
+        {
+            var newarr = new List<BoardDesc>();
+            foreach (var id in newids)
+            {
+                newarr.Add(desc.Boards.Find(b => b.Id == id)!);
+            }
+            desc.Boards = newarr;
+            ModuleManager.Ins.WorkspaceManager.Save();
+        }
     }
 }

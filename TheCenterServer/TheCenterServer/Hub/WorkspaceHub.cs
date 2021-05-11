@@ -130,6 +130,11 @@ namespace TheCenterServer
         {
             ModuleManager.Ins.WorkspaceManager.Get(work).RenameBoard(board, newname);
         }
+
+        public void SortBoards(string workspace, List<string> newids)
+        {
+            ModuleManager.Ins.WorkspaceManager.Get(workspace).SortBoards(newids);
+        }
     }
 
     public class WorkspaceBackgroundService : IHostedService

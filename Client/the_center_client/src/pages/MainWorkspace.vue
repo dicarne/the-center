@@ -1,6 +1,7 @@
 <template>
     <div class="main-work-area">
-        <a-button @click="getboard()">刷新</a-button>
+        <a-button @click="getboard">刷新</a-button>
+        <a-button @click="openSortBoards">排序</a-button>
     </div>
 
     <Row :gutter="[16, 16]">
@@ -27,22 +28,36 @@
             </a-menu-item>
         </a-menu>
     </a-modal>
+    <a-modal title="排序卡片" v-model:visible="b_openSortBoards" @ok="sortBoards">
+        <draggable
+            v-model="borderOrder"
+            @start="sort_drag = true"
+            @end="sort_drag = false"
+            item-key="id"
+        >
+            <template #item="{ element }">
+                <div class="sort-item">{{ element.name }}</div>
+            </template>
+        </draggable>
+    </a-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, reactive, ref } from "vue";
 import { Row, Col } from "ant-design-vue";
-import { BoardUI, CreateBoard, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected } from "../api/workspace";
+import { BoardUI, CreateBoard, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, SortBoards } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import BoardCard from "./BoardCard.vue"
 import { workspaces } from "../connection/Server"
+import draggable from 'vuedraggable'
 
 export default defineComponent({
     components: {
         Row,
         Col,
         BoardElement,
-        BoardCard
+        BoardCard,
+        draggable
     },
     props: {
         workspace: {
@@ -107,7 +122,23 @@ export default defineComponent({
             createCard.cardTypes = await GetAllBoardTypes();
         }
         // ------
-        return { getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard };
+
+        const borderOrder = ref<{ id: string, name: string }[]>([])
+        const b_openSortBoards = ref(false)
+        const openSortBoards = () => {
+            b_openSortBoards.value = true;
+            borderOrder.value = list.value.map(l => { return { id: l.id, name: l.cName } })
+        }
+        const sortBoards = async () => {
+            await SortBoards(prop.workspace, borderOrder.value.map(l => l.id))
+            b_openSortBoards.value = false
+            await getboard()
+        }
+        const sort_drag = ref(false)
+        return {
+            getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard, openSortBoards, sortBoards, sort_drag,
+            b_openSortBoards, borderOrder
+        };
     },
 });
 </script>
@@ -127,5 +158,10 @@ export default defineComponent({
 }
 .card-board:hover {
     box-shadow: 0px 0px 10px #d3d3d3;
+}
+.sort-item {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
+    padding: 8px;
 }
 </style>
