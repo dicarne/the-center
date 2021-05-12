@@ -56,7 +56,7 @@ export default defineComponent({
         })
 
         const createWorkspace = () => {
-            prop.createWorkspace("test")
+            prop.createWorkspace("未命名")
         }
         return {
             stopServer, serverAlive,

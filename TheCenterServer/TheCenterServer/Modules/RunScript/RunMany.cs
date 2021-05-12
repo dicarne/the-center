@@ -42,6 +42,11 @@ namespace TheCenterServer.PModule
 
         }
 
+        public override void Excute()
+        {
+            Run();
+        }
+
         /// <summary>
         /// 保存列表更改
         /// </summary>

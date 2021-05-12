@@ -22,7 +22,7 @@
                 <a-button @click="createBoard">+</a-button>
             </div>
         </Col>
-        <Col v-for="item in list" :key="item.id" :span="item.w">
+        <Col v-for="item in list.boards" :key="item.id" :span="item.w">
             <BoardCard
                 :ver="item.ver"
                 :u-i-coms="item.uIComs"
@@ -91,11 +91,11 @@ export default defineComponent({
         }
     },
     setup: (prop) => {
-        const list = ref([] as BoardUI[]);
+        const list = reactive({boards: [] as BoardUI[]});
 
         const getboard = async () => {
-            list.value = (await GetBoards(prop.workspace)).filter(b => !b.hide);
-            list.value.forEach(u => u.ver = 0)
+            list.boards = (await GetBoards(prop.workspace)).filter(b => !b.hide);
+            list.boards.forEach(u => { if (u.ver === undefined) u.ver = 0 })
         };
 
         onConnected(async () => {
@@ -110,9 +110,9 @@ export default defineComponent({
 
         const dispatchBoard = (board: string, data: string) => {
             let jdata = JSON.parse(data)
-            let index = list.value.findIndex(u => u.id === board)
-            list.value[index].uIComs = ref(jdata)
-            list.value[index].ver++
+            let index = list.boards.findIndex(u => u.id === board)
+            list.boards[index].uIComs = ref(jdata)
+            list.boards[index].ver++
         }
         onMounted(() => {
             if (prop.workspace != "home") {
@@ -150,7 +150,7 @@ export default defineComponent({
         const b_openSortBoards = ref(false)
         const openSortBoards = () => {
             b_openSortBoards.value = true;
-            borderOrder.value = list.value.map(l => { return { id: l.id, name: l.cName } })
+            borderOrder.value = list.boards.map(l => { return { id: l.id, name: l.cName } })
         }
         const sortBoards = async () => {
             await SortBoards(prop.workspace, borderOrder.value.map(l => l.id))

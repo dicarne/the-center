@@ -32,7 +32,7 @@
     </a-modal>
 </template>
 <script lang="ts">
-import { createVNode, defineComponent, PropType, reactive, ref } from "vue";
+import { createVNode, defineComponent, PropType, reactive, ref, watch } from "vue";
 import { BoardUI, DeleteBoard, RenameBoard, UICom } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -69,7 +69,7 @@ export default defineComponent({
             required: true
         },
         environment: {
-            type: Object as PropType<BoardUI[]>,
+            type: Object as PropType<{ boards: BoardUI[] }>,
             required: true
         }
     },
@@ -111,6 +111,7 @@ export default defineComponent({
             title.value = rename_value.value
             menuVisiable.rename = false
         }
+
         return {
             onClick, title, menuVisiable, rename, rename_value, env: prop.environment
         }

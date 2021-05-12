@@ -50,7 +50,7 @@ export default defineComponent({
             required: true,
         },
         environment: {
-            type: Object as PropType<BoardUI[]>,
+            type: Object as PropType<{ boards: BoardUI[] }>,
             required: true
         }
     },
@@ -96,12 +96,13 @@ export default defineComponent({
                 transfer.open_stat = true
                 var ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, "onShow")
                 transfer.tar = ret.ava
+                transfer.list = prop.environment.boards.map(it => { return { ...it, key: it.id, title: it.cName, disabled: it.id === prop.board } })
             },
             comfirm: async () => {
                 transfer.open_stat = false;
                 await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, "onChange", [JSON.stringify(transfer.tar), "[]"])
             },
-            list: prop.environment.map(it => { return { ...it, key: it.id, title: it.cName, disabled: it.id === prop.board } }),
+            list: prop.environment.boards.map(it => { return { ...it, key: it.id, title: it.cName, disabled: it.id === prop.board } }),
             tar: [] as string[],
             select: [] as string[],
             render: (k: BoardUI) => {
