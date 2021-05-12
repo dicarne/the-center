@@ -1,0 +1,3 @@
+server工程中打包
+the_center_client中yarn build
+本工程中yarn dist

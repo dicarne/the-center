@@ -1,38 +1,31 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text.Json;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TheCenterServer.PModule
 {
-    [PModule("runscript", "ÔËÐÐ½Å±¾")]
-    public class RunScript : ModuleBase
+    [PModule("opendirfile", "æ‰“å¼€æ–‡ä»¶ï¼ˆå¤¹ï¼‰")]
+    public class OpenDirFile : ModuleBase
     {
+        [UI]
+        Input scriptPathUI = new("", placeholder: "æ–‡ä»¶å¤¹è·¯å¾„".UTF8(), onChange: "OnChange");
 
         [UI]
-        Input scriptPathUI = new("", placeholder: "½Å±¾Â·¾¶".UTF8(), onChange: "OnChange");
-
-        [UI]
-        Button runBtn = new("ÔËÐÐ".UTF8(), onClick: "Run");
+        Button runBtn = new("æ‰“å¼€".UTF8(), onClick: "Run");
 
         [UI]
         Text resText = new("", textAlign: TextAlign.left);
 
         [Persistence]
+        public string scriptPath { get; set; } = "";
         public string result { get; set; } = "";
 
-        [Persistence]
-        public string scriptPath { get; set; } = "";
-
-        public override Task OnLoad()
+        public override void Excute()
         {
-            SetState(() =>
-            {
-                result = "";
-            });
-            return Task.CompletedTask;
+            Run();
         }
 
         [Method]
@@ -50,40 +43,24 @@ namespace TheCenterServer.PModule
             {
                 SetState(() =>
                 {
-                    result = "¸ÃÂ·¾¶²»´æÔÚ£¡";
+                    result = "è¯¥è·¯å¾„ä¸å­˜åœ¨ï¼";
                     SyncUI();
                 });
                 return "";
             }
-
+            
             Process pro = new Process();
-            var dir = Path.GetDirectoryName(content);
-            pro.StartInfo.WorkingDirectory = dir;
-            pro.StartInfo.FileName = content;
+            pro.StartInfo.FileName = "explorer";
+            pro.StartInfo.Arguments = scriptPath;
             pro.StartInfo.UseShellExecute = false;
             pro.StartInfo.CreateNoWindow = true;
             pro.StartInfo.RedirectStandardOutput = true;
-            pro.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
-            {
-                SetState(() =>
-                {
-                    result += e.Data + "\n";
-                    try
-                    {
-                        SyncUI();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Write(e);
-                    }
 
-                });
-            };
             try
             {
                 pro.Start();
                 pro.BeginOutputReadLine();
-                //pro.WaitForExitAsync();
+                pro.WaitForExitAsync();
             }
             catch (Exception e)
             {
@@ -96,11 +73,6 @@ namespace TheCenterServer.PModule
 
 
             return "";
-        }
-
-        public override void Excute()
-        {
-            Run();
         }
 
         [Method]

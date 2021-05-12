@@ -1,7 +1,7 @@
 <template>
     <a-layout>
         <a-layout-sider
-            width="50"
+            width="100"
             :style="{
                 overflow: 'auto',
                 height: '100vh',
@@ -13,49 +13,36 @@
                 theme="dark"
                 mode="inline"
                 v-model:selectedKeys="control.selectedKeys"
+                @click="changeWorkspace"
             >
-                <a-menu-item key="1">
-                    <user-outlined />
+                <a-menu-item key="home">
+                    <p>主页</p>
                 </a-menu-item>
-                <a-menu-item key="2">
-                    <video-camera-outlined />
-                </a-menu-item>
-                <a-menu-item key="3">
-                    <upload-outlined />
-                </a-menu-item>
-                <a-menu-item key="4">
-                    <bar-chart-outlined />
-                </a-menu-item>
-                <a-menu-item key="5">
-                    <cloud-outlined />
-                </a-menu-item>
-                <a-menu-item key="6">
-                    <appstore-outlined />
-                </a-menu-item>
-                <a-menu-item key="7">
-                    <team-outlined />
-                </a-menu-item>
-                <a-menu-item key="8">
-                    <shop-outlined />
+                <a-menu-divider />
+                <a-menu-item :key="item.id" v-for="item in workspaces">
+                    <p>{{ item.wName }}</p>
                 </a-menu-item>
             </a-menu>
         </a-layout-sider>
     </a-layout>
-    <a-layout :style="{ marginLeft: '50px' }">
-        <a-layout-content
-            :style="{ margin: '24px 16px 0', overflow: 'initial' }"
-        >
+    <a-layout :style="{ marginLeft: '100px', minHeight: '100vh' }">
+        <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
             <MainWorkspace
-                v-if="currentWorkspace != null"
+                v-if="currentWorkspace != null && currentWorkspace != 'home' && currentWorkspaceObj != null"
                 :workspace="currentWorkspace"
-            />
+                :key="currentWorkspace"
+                :workspaceObj="currentWorkspaceObj"
+                :reload="reload"
+            ></MainWorkspace>
+            <Home v-if="currentWorkspace == 'home'" :createWorkspace="createWorkspace" />
         </a-layout-content>
     </a-layout>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
-import MainWorkspace from "./components/MainWorkspace.vue";
+import MainWorkspace from "./pages/MainWorkspace.vue";
+import Home from "./pages/Home.vue"
 import {
     UserOutlined,
     VideoCameraOutlined,
@@ -66,12 +53,11 @@ import {
     TeamOutlined,
     ShopOutlined,
 } from "@ant-design/icons-vue";
-import { onConnected } from "./api/workspace";
+import { GetWorkspaceList, onConnected, WorkspaceDesc, CreateWorkspace } from "./api/workspace";
 export default defineComponent({
     name: "App",
     components: {
         MainWorkspace,
-
         UserOutlined,
         VideoCameraOutlined,
         UploadOutlined,
@@ -80,20 +66,72 @@ export default defineComponent({
         AppstoreOutlined,
         TeamOutlined,
         ShopOutlined,
+        Home
     },
     setup: () => {
-        const currentWorkspace = ref(null as string | null);
-        onConnected(() => {
-            currentWorkspace.value = "TEST";
+        const currentWorkspace = ref("home");
+        const currentWorkspaceObj = ref<null | WorkspaceDesc>(null)
+        const workspaces = ref<null | WorkspaceDesc[]>(null);
+
+        const getWorkspace = async () => {
+            workspaces.value = await GetWorkspaceList();
+        }
+
+        onConnected(async () => {
+            await getWorkspace();
         });
 
         const control = reactive({
-            selectedKeys: ["1"]
+            selectedKeys: ["home"] as string[]
         })
 
+
+        const createWorkspace = async (name: string) => {
+            const ret = await CreateWorkspace(name);
+            await getWorkspace();
+            currentWorkspace.value = ret;
+            currentWorkspaceObj.value = workspaces.value?.find(w => w.id === ret)!
+            control.selectedKeys = [ret]
+        }
+
+        const changeWorkspace = (e: any) => {
+            currentWorkspace.value = e.key;
+            if (e.key != "home") {
+                currentWorkspaceObj.value = workspaces.value?.find(w => w.id == e.key) || null
+
+            } else {
+                currentWorkspaceObj.value = null
+            }
+        }
+
+        const reload = async (old: string) => {
+            const oldindex = workspaces.value?.findIndex(w => w.id === old)!
+            await getWorkspace();
+            if (currentWorkspace.value != "home" && workspaces.value?.findIndex((w) => w.id === currentWorkspace.value) === -1) {
+                if (workspaces.value.length === 0) {
+                    currentWorkspace.value = "home"
+                    control.selectedKeys = ["home"]
+                } else {
+                    if (workspaces.value.length <= oldindex) {
+                        currentWorkspace.value = workspaces.value[workspaces.value.length - 1].id
+                        currentWorkspaceObj.value = workspaces.value[workspaces.value.length - 1]
+                        control.selectedKeys = [currentWorkspace.value]
+                    } else {
+                        currentWorkspace.value = workspaces.value[oldindex].id
+                        currentWorkspaceObj.value = workspaces.value[oldindex]
+                        control.selectedKeys = [currentWorkspace.value]
+                    }
+                }
+            }
+        }
         return {
             currentWorkspace,
-            control
+            control,
+            workspaces,
+            createWorkspace,
+            changeWorkspace,
+            currentWorkspaceObj,
+            reload
         };
     },
 });
