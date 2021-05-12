@@ -111,6 +111,7 @@ namespace TheCenterServer.PModule
         /// <returns></returns>
         public object? HandleUIEvent(string control, string eventname, string[]? args = null)
         {
+           
             if (controls.TryGetValue(control, out var ins))
             {
                 var eventbind = ins.EventBind.FirstOrDefault(e => e.eventname == eventname);
@@ -119,6 +120,7 @@ namespace TheCenterServer.PModule
                     var method = eventbind.method;
                     if (methods.TryGetValue(method, out var minfo))
                     {
+                        
                         return minfo.Invoke(this, args);
                     }
                     else

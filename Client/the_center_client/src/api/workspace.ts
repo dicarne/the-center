@@ -79,14 +79,19 @@ export async function Ping() {
   return await connection.invoke(
     "Alive"
   )
-}
+} RenameWorkspace
+export async function RenameWorkspace(id: string, newname: string) {
 
+  return await connection.invoke(
+    "RenameWorkspace", id, newname
+  )
+}
 export async function HandleBoardUIEvent(
   workspace: string,
   boardid: string,
   ui: string,
   event: string,
-  arg?: string[]
+  arg?: any[]
 ) {
   return await connection.invoke("HandleEvent", JSON.stringify({
     wk: workspace,

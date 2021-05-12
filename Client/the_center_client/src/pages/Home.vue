@@ -1,13 +1,15 @@
 <template>
     <a-col>
-        <a-row>
-            <a-button @click="stopServer">Stop</a-button>
+        <a-row :gutter="[16, 16]">
+            <a-col>
+                <p>{{ `服务器状态：${serverAlive ? "在线" : "离线"} ` }}</p>
+            </a-col>
+            <a-col>
+                <a-button @click="stopServer">停止运行服务器</a-button>
+            </a-col>
         </a-row>
         <a-row>
-            <p>{{ serverAlive ? "在线" : "离线" }}</p>
-        </a-row>
-        <a-row>
-            <a-button @click="createWorkspace">+</a-button>
+            <a-button @click="createWorkspace">创建新工作区</a-button>
         </a-row>
     </a-col>
 </template>

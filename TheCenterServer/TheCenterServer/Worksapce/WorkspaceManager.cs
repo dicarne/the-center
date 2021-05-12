@@ -85,6 +85,7 @@ namespace TheCenterServer
             }
         }
 
+
         public void Save()
         {
             var list = Workspaces.Select(w => w.desc).ToList();
@@ -206,6 +207,12 @@ namespace TheCenterServer
                 newarr.Add(desc.Boards.Find(b => b.Id == id)!);
             }
             desc.Boards = newarr;
+            ModuleManager.Ins.WorkspaceManager.Save();
+        }
+
+        public void Rename(string newname)
+        {
+            desc.WName = newname;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
     }

@@ -1,7 +1,7 @@
 <template>
     <a-layout>
         <a-layout-sider
-            width="50"
+            width="100"
             :style="{
                 overflow: 'auto',
                 height: '100vh',
@@ -15,19 +15,23 @@
                 v-model:selectedKeys="control.selectedKeys"
                 @click="changeWorkspace"
             >
-                <a-button @click="home">+</a-button>
+                <a-menu-item key="home">
+                    <p>主页</p>
+                </a-menu-item>
+                <a-menu-divider />
                 <a-menu-item :key="item.id" v-for="item in workspaces">
-                    <p>{{ item.id }}</p>
+                    <p>{{ item.wName }}</p>
                 </a-menu-item>
             </a-menu>
         </a-layout-sider>
     </a-layout>
-    <a-layout :style="{ marginLeft: '50px', minHeight: '100vh' }">
+    <a-layout :style="{ marginLeft: '100px', minHeight: '100vh' }">
         <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'initial' }">
             <MainWorkspace
-                v-if="currentWorkspace != null && currentWorkspace != 'home'"
+                v-if="currentWorkspace != null && currentWorkspace != 'home' && currentWorkspaceObj != null"
                 :workspace="currentWorkspace"
                 :key="currentWorkspace"
+                :workspaceObj="currentWorkspaceObj"
             ></MainWorkspace>
             <Home v-if="currentWorkspace == 'home'" :createWorkspace="createWorkspace" />
         </a-layout-content>
@@ -65,6 +69,7 @@ export default defineComponent({
     },
     setup: () => {
         const currentWorkspace = ref("home");
+        const currentWorkspaceObj = ref<null | WorkspaceDesc>(null)
         const workspaces = ref<null | WorkspaceDesc[]>(null);
 
         const getWorkspace = async () => {
@@ -76,12 +81,10 @@ export default defineComponent({
         });
 
         const control = reactive({
-            selectedKeys: [] as string[]
+            selectedKeys: ["home"] as string[]
         })
 
-        const home = async () => {
-            currentWorkspace.value = "home"
-        }
+
         const createWorkspace = async (name: string) => {
             const ret = await CreateWorkspace(name);
             await getWorkspace();
@@ -91,6 +94,12 @@ export default defineComponent({
 
         const changeWorkspace = (e: any) => {
             currentWorkspace.value = e.key;
+            if (e.key != "home") {
+                currentWorkspaceObj.value = workspaces.value?.find(w => w.id == e.key) || null
+
+            } else {
+                currentWorkspaceObj.value = null
+            }
         }
 
         return {
@@ -99,7 +108,7 @@ export default defineComponent({
             workspaces,
             createWorkspace,
             changeWorkspace,
-            home
+            currentWorkspaceObj,
         };
     },
 });

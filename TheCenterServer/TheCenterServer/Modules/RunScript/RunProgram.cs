@@ -70,6 +70,7 @@ namespace TheCenterServer.PModule
                 });
             }
         }
+
         [Method]
         void CommandChange(string newstr)
         {
@@ -78,6 +79,7 @@ namespace TheCenterServer.PModule
                 command = newstr;
             });
         }
+
         [Method]
         void PathChange(string newstr)
         {

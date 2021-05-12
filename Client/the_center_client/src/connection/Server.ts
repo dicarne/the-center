@@ -1,6 +1,9 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
 export const dev = import.meta.env.MODE == "development";
-console.log(dev)
+if (dev) {
+  console.log("当前为开发模式")
+}
+
 export const connection = new HubConnectionBuilder()
   .withUrl(`http://localhost:${dev ? 5000 : 5800}/workspace`)
   .withAutomaticReconnect()

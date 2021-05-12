@@ -54,6 +54,11 @@ namespace TheCenterServer
             return ModuleManager.Ins.WorkspaceManager.Workspaces.Select(w => w.desc).ToList();
         }
 
+        public void RenameWorkspace(string id, string newname)
+        {
+            ModuleManager.Ins.WorkspaceManager.Get(id).Rename(newname);
+        }
+
         public string CreateWorkspace(string name)
         {
             var wk = ModuleManager.Ins.WorkspaceManager.Create(name);

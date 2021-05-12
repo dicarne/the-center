@@ -8,6 +8,7 @@
                 :ui="ui"
                 :workspace="workspace"
                 :board="boardid"
+                :environment="env"
             />
         </div>
     </div>
@@ -66,6 +67,10 @@ export default defineComponent({
         board: {
             type: Object as PropType<BoardUI>,
             required: true
+        },
+        environment: {
+            type: Object as PropType<BoardUI[]>,
+            required: true
         }
     },
     setup: (prop) => {
@@ -107,7 +112,7 @@ export default defineComponent({
             menuVisiable.rename = false
         }
         return {
-            onClick, title, menuVisiable, rename, rename_value
+            onClick, title, menuVisiable, rename, rename_value, env: prop.environment
         }
     },
 })

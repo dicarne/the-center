@@ -1,7 +1,13 @@
 <template>
     <div class="main-work-area">
-        <a-button @click="getboard">刷新</a-button>
-        <a-button @click="openSortBoards">排序</a-button>
+        <a-row>
+            <a-col span="6">
+                <a-input v-model:value="env.wName" @change="renameWorkspace" />
+            </a-col>
+
+            <a-button @click="getboard">刷新</a-button>
+            <a-button @click="openSortBoards">排序</a-button>
+        </a-row>
     </div>
 
     <Row :gutter="[16, 16]">
@@ -18,6 +24,7 @@
                 :boardid="item.id"
                 :getboard="getboard"
                 :board="item"
+                :environment="list"
             />
         </Col>
     </Row>
@@ -43,9 +50,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, reactive, ref } from "vue";
+import { defineComponent, onMounted, onUnmounted, PropType, reactive, ref } from "vue";
 import { Row, Col } from "ant-design-vue";
-import { BoardUI, CreateBoard, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, SortBoards } from "../api/workspace";
+import { BoardUI, CreateBoard, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, RenameWorkspace, SortBoards, WorkspaceDesc } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import BoardCard from "./BoardCard.vue"
 import { workspaces } from "../connection/Server"
@@ -67,6 +74,10 @@ export default defineComponent({
             },
             required: true,
         },
+        workspaceObj: {
+            type: Object as PropType<WorkspaceDesc>,
+            required: true
+        }
     },
     setup: (prop) => {
         const list = ref([] as BoardUI[]);
@@ -75,6 +86,7 @@ export default defineComponent({
             list.value = (await GetBoards(prop.workspace)).filter(b => !b.hide);
             list.value.forEach(u => u.ver = 0)
         };
+
         onConnected(async () => {
             try {
                 await FocusWorkspace(prop.workspace)
@@ -122,7 +134,7 @@ export default defineComponent({
             createCard.cardTypes = await GetAllBoardTypes();
         }
         // ------
-
+        // 排序卡片
         const borderOrder = ref<{ id: string, name: string }[]>([])
         const b_openSortBoards = ref(false)
         const openSortBoards = () => {
@@ -135,9 +147,15 @@ export default defineComponent({
             await getboard()
         }
         const sort_drag = ref(false)
+        // ------
+        // 重命名空间
+        const renameWorkspace = async (e: any) => {
+            await RenameWorkspace(prop.workspace, prop.workspaceObj.wName)
+        }
+        // ------
         return {
             getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard, openSortBoards, sortBoards, sort_drag,
-            b_openSortBoards, borderOrder
+            b_openSortBoards, borderOrder, env: prop.workspaceObj, renameWorkspace
         };
     },
 });
