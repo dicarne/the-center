@@ -38,7 +38,7 @@ namespace TheCenterServer.PModule
             var dir = scriptPath;
             dir = dir.TrimStart('"');
             dir = dir.TrimEnd('"');
-            if (!Directory.Exists(dir) && !File.Exists(dir))
+            if (dir != "web" && !Directory.Exists(dir) && !File.Exists(dir))
             {
                 SetState(() =>
                 {

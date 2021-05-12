@@ -39,7 +39,7 @@ namespace TheCenterServer.PModule
             var content = scriptPath;
             content = content.TrimStart('"');
             content = content.TrimEnd('"');
-            if (!Directory.Exists(content) && !File.Exists(content))
+            if (!content.StartsWith("http") && !Directory.Exists(content) && !File.Exists(content))
             {
                 SetState(() =>
                 {
@@ -60,7 +60,7 @@ namespace TheCenterServer.PModule
             {
                 pro.Start();
                 pro.BeginOutputReadLine();
-                pro.WaitForExitAsync();
+                //pro.WaitForExitAsync();
             }
             catch (Exception e)
             {
