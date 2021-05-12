@@ -156,6 +156,15 @@ namespace TheCenterServer
         {
             return true;
         }
+
+        public void Config_SetDBPath(string newpath)
+        {
+            WorkspaceManager.Ins.SetConfig(c =>
+            {
+                c.DBPath = newpath;
+            });
+        }
+        public string Config_GetDBPath() => WorkspaceManager.DBPath;
     }
 
     public class WorkspaceBackgroundService : IHostedService

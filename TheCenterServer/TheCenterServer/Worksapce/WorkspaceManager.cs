@@ -4,18 +4,80 @@ using System.Linq;
 using TheCenterServer.PModule;
 using LiteDB;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.IO;
+using System.Text.Json;
 
 namespace TheCenterServer
 {
     public class WorkspaceManager : IDisposable
     {
-        public static string DBPath = @"D://test.db";
+        public static string DBPath => Ins.config.DBPath;
         public static LiteDatabase DB;
         public List<Workspace> Workspaces = new();
+        public static WorkspaceManager Ins;
+        public class WorkspaceConfig
+        {
+            public string DBPath { get; set; } = @"D://test.db";
+        }
+        WorkspaceConfig config;
 
+        readonly string configPath;
         public WorkspaceManager()
         {
+            Ins = this;
+            var appdata = Path.Combine(Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "AppData" : "Home")!, "TheCenter");
+            if (!Directory.Exists(appdata)) Directory.CreateDirectory(appdata);
+            var configp = Path.Combine(appdata, "config.json");
+            configPath = configp;
+            if (File.Exists(configp))
+            {
+                try
+                {
+                    config = System.Text.Json.JsonSerializer.Deserialize<WorkspaceConfig>(File.ReadAllText(configp))!;
+                }
+                catch (Exception e)
+                {
+                    config = new WorkspaceConfig()
+                    {
+                        DBPath = Path.Combine(appdata, "thecenterdb.db")
+                    };
+                    File.Move(configPath, configp + "." + DateTime.UtcNow.Ticks);
+                    File.WriteAllText(configPath, System.Text.Json.JsonSerializer.Serialize(config));
+                }
+            }
+            else
+            {
+                config = new WorkspaceConfig()
+                {
+                    DBPath = Path.Combine(appdata, "thecenterdb.db")
+                };
+                File.WriteAllText(configPath, System.Text.Json.JsonSerializer.Serialize(config));
+            }
+
+#if DEBUG
+            config.DBPath = Path.Combine(appdata, "thecenterdb_debug.db");
+#endif
+
             DB = new LiteDatabase(DBPath);
+        }
+
+        public void SetConfig(Action<WorkspaceConfig> modify)
+        {
+            var oldpath = config.DBPath;
+            modify(config);
+            
+            File.WriteAllText(configPath, System.Text.Json.JsonSerializer.Serialize(config));
+            if (config.DBPath != oldpath)
+            {
+                DB.Dispose();
+                // 移动数据库
+                if (!File.Exists(config.DBPath))
+                {
+                    File.Move(oldpath, config.DBPath);
+                }
+                DB = new LiteDatabase(DBPath);
+            }
         }
 
         /// <summary>

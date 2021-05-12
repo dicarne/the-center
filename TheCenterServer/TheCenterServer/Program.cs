@@ -20,10 +20,10 @@ namespace TheCenterServer
             // Create a root command with some options
             var rootCommand = new RootCommand
             {
-                new Option<string>(
+                /*new Option<string>(
                     "--dbpath",
                     getDefaultValue: () => @"D://data.db",
-                    description: "Where is your database."),
+                    description: "Where is your database."),*/
                 new Option<string?>(
                     "--gen-api-doc",
                     getDefaultValue: () => null,
@@ -31,9 +31,9 @@ namespace TheCenterServer
             };
             bool quit = false;
             // Note that the parameters of the handler method are matched according to the names of the options
-            rootCommand.Handler = CommandHandler.Create<string, string?>((dbpath, genapidoc) =>
+            rootCommand.Handler = CommandHandler.Create<string/*, string?*/>((/*dbpath, */genapidoc) =>
             {
-                WorkspaceManager.DBPath = dbpath;
+                /*WorkspaceManager.DBPath = dbpath;*/
                 if (!string.IsNullOrEmpty(genapidoc))
                 {
                     DocGen.Gen(genapidoc);
