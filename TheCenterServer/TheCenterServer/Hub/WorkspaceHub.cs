@@ -65,6 +65,11 @@ namespace TheCenterServer
             return wk.desc.Id;
         }
 
+        public void DeleteWorkspace(string id)
+        {
+            ModuleManager.Ins.WorkspaceManager.Delete(id);
+        }
+
         public bool CreateBoard(string wkspace, string bdtype)
         {
             try

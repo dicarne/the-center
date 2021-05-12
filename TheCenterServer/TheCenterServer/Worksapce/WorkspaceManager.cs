@@ -112,7 +112,7 @@ namespace TheCenterServer
             }
         }
 
-        
+
         class WorkspaceSaveData
         {
             public ObjectId _id { get; set; }

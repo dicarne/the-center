@@ -4,9 +4,15 @@
             <a-col span="6">
                 <a-input v-model:value="env.wName" @change="renameWorkspace" />
             </a-col>
-
-            <a-button @click="getboard">刷新</a-button>
-            <a-button @click="openSortBoards">排序</a-button>
+            <a-col span="6">
+                <a-button @click="getboard">刷新</a-button>
+            </a-col>
+            <a-col span="6">
+                <a-button @click="openSortBoards">排序</a-button>
+            </a-col>
+            <a-col span="6">
+                <a-button @click="deleteWorkspace">删除</a-button>
+            </a-col>
         </a-row>
     </div>
 
@@ -50,13 +56,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, PropType, reactive, ref } from "vue";
-import { Row, Col } from "ant-design-vue";
-import { BoardUI, CreateBoard, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, RenameWorkspace, SortBoards, WorkspaceDesc } from "../api/workspace";
+import { createVNode, defineComponent, onMounted, onUnmounted, PropType, reactive, ref } from "vue";
+import { Row, Col, Modal } from "ant-design-vue";
+import { BoardUI, CreateBoard, DeleteWorkspace, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, RenameWorkspace, SortBoards, WorkspaceDesc } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import BoardCard from "./BoardCard.vue"
 import { workspaces } from "../connection/Server"
 import draggable from 'vuedraggable'
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 
 export default defineComponent({
     components: {
@@ -76,6 +83,10 @@ export default defineComponent({
         },
         workspaceObj: {
             type: Object as PropType<WorkspaceDesc>,
+            required: true
+        },
+        reload: {
+            type: Function,
             required: true
         }
     },
@@ -153,9 +164,28 @@ export default defineComponent({
             await RenameWorkspace(prop.workspace, prop.workspaceObj.wName)
         }
         // ------
+        // 删除空间
+        const deleteWorkspace = () => {
+            Modal.confirm({
+                title: '该操作不可撤销，请谨慎操作！',
+                icon: createVNode(ExclamationCircleOutlined),
+                content: '你确定要删除此工作空间？',
+                okText: '删除',
+                okType: 'danger',
+                cancelText: '取消',
+                async onOk() {
+                    await DeleteWorkspace(prop.workspace)
+                    prop.reload(prop.workspace)
+                },
+                onCancel() {
+                },
+            });
+
+        }
+        // ------
         return {
             getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard, openSortBoards, sortBoards, sort_drag,
-            b_openSortBoards, borderOrder, env: prop.workspaceObj, renameWorkspace
+            b_openSortBoards, borderOrder, env: prop.workspaceObj, renameWorkspace, deleteWorkspace
         };
     },
 });

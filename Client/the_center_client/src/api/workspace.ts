@@ -75,7 +75,7 @@ export async function StopServer() {
   )
 }
 export async function Ping() {
-
+  console.log("ping...")
   return await connection.invoke(
     "Alive"
   )
@@ -84,6 +84,12 @@ export async function RenameWorkspace(id: string, newname: string) {
 
   return await connection.invoke(
     "RenameWorkspace", id, newname
+  )
+}
+export async function DeleteWorkspace(id: string) {
+
+  return await connection.invoke(
+    "DeleteWorkspace", id
   )
 }
 export async function HandleBoardUIEvent(

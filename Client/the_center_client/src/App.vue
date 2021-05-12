@@ -32,6 +32,7 @@
                 :workspace="currentWorkspace"
                 :key="currentWorkspace"
                 :workspaceObj="currentWorkspaceObj"
+                :reload="reload"
             ></MainWorkspace>
             <Home v-if="currentWorkspace == 'home'" :createWorkspace="createWorkspace" />
         </a-layout-content>
@@ -89,6 +90,7 @@ export default defineComponent({
             const ret = await CreateWorkspace(name);
             await getWorkspace();
             currentWorkspace.value = ret;
+            currentWorkspaceObj.value = workspaces.value?.find(w => w.id === ret)!
             control.selectedKeys = [ret]
         }
 
@@ -102,6 +104,26 @@ export default defineComponent({
             }
         }
 
+        const reload = async (old: string) => {
+            const oldindex = workspaces.value?.findIndex(w => w.id === old)!
+            await getWorkspace();
+            if (currentWorkspace.value != "home" && workspaces.value?.findIndex((w) => w.id === currentWorkspace.value) === -1) {
+                if (workspaces.value.length === 0) {
+                    currentWorkspace.value = "home"
+                    control.selectedKeys = ["home"]
+                } else {
+                    if (workspaces.value.length <= oldindex) {
+                        currentWorkspace.value = workspaces.value[workspaces.value.length - 1].id
+                        currentWorkspaceObj.value = workspaces.value[workspaces.value.length - 1]
+                        control.selectedKeys = [currentWorkspace.value]
+                    } else {
+                        currentWorkspace.value = workspaces.value[oldindex].id
+                        currentWorkspaceObj.value = workspaces.value[oldindex]
+                        control.selectedKeys = [currentWorkspace.value]
+                    }
+                }
+            }
+        }
         return {
             currentWorkspace,
             control,
@@ -109,6 +131,7 @@ export default defineComponent({
             createWorkspace,
             changeWorkspace,
             currentWorkspaceObj,
+            reload
         };
     },
 });
