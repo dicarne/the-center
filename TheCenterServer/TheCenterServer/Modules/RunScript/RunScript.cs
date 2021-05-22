@@ -15,16 +15,27 @@ namespace TheCenterServer.PModule
         Input scriptPathUI = new("", placeholder: "脚本路径".UTF8(), onChange: "OnChange");
 
         [UI]
+        Input paramsUI = new("", placeholder: "参数".UTF8(), onChange: "OnParamChange");
+
+        [UI]
         Button runBtn = new("运行".UTF8(), onClick: "Run");
 
         [UI]
         Text resText = new("", textAlign: TextAlign.left);
+
+        [UI]
+        More showMore = new(onClick: "switchMore");
 
         [Persistence]
         public string result { get; set; } = "";
 
         [Persistence]
         public string scriptPath { get; set; } = "";
+        [Persistence]
+        public string paramsText { get; set; } = "";
+
+        [Persistence]
+        public bool showmore { get; set; }
 
         public override Task OnLoad()
         {
@@ -60,6 +71,7 @@ namespace TheCenterServer.PModule
             var dir = Path.GetDirectoryName(content);
             pro.StartInfo.WorkingDirectory = dir;
             pro.StartInfo.FileName = content;
+            pro.StartInfo.Arguments = paramsText;
             pro.StartInfo.UseShellExecute = false;
             pro.StartInfo.CreateNoWindow = true;
             pro.StartInfo.RedirectStandardOutput = true;
@@ -112,14 +124,42 @@ namespace TheCenterServer.PModule
             });
         }
 
+        [Method]
+        void OnParamChange(string newcontent)
+        {
+            SetState(() =>
+            {
+                paramsText = newcontent;
+            });
+        }
+
+        [Method]
+        void switchMore()
+        {
+            SetState(() =>
+            {
+                showmore = !showmore;
+                SyncUI();
+            });
+        }
+
         public override List<UICom> BuildInterface()
         {
             var ui = new List<UICom>()
             {
                 scriptPathUI.text(scriptPath),
-                runBtn
+
             };
+            if (showmore)
+            {
+                ui.Add(paramsUI.text(paramsText));
+            }
+            ui.Add(showMore.isshow(showmore));
+
+            ui.Add(runBtn);
+
             if (result != "") ui.Add(resText.text(result));
+
             return ui;
         }
     }

@@ -75,7 +75,6 @@ export async function StopServer() {
   )
 }
 export async function Ping() {
-  console.log("ping...")
   return await connection.invoke(
     "Alive"
   )
@@ -158,4 +157,17 @@ export interface UICom {
   style: Object;
   prop: Object;
   event: string[];
+}
+
+
+export async function Config_SetDBPath(id: string) {
+
+  return await connection.invoke(
+    "Config_SetDBPath", id
+  )
+} export async function Config_GetDBPath(): Promise<string> {
+
+  return (await connection.invoke(
+    "Config_GetDBPath"
+  )) as string
 }

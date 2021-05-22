@@ -6,6 +6,17 @@
             :style="uiStyle"
         >{{ textvalue }}</a-button>
         <a-button v-if="ui.type === 'button'" @click="click" :style="uiStyle">{{ textvalue }}</a-button>
+        <a
+            v-if="ui.type === 'more'"
+            @click="click"
+            class="ant-dropdown-link"
+            href="javascript:;"
+            :style="uiStyle"
+        >
+            <UpOutlined v-if="uiProp.isshow" />
+            <DownOutlined v-if="!uiProp.isshow" />
+            {{ " " + textvalue }}
+        </a>
         <p v-if="ui.type === 'text'" class="text" :style="uiStyle">{{ textvalue }}</p>
         <a-input
             v-if="ui.type === 'input'"
@@ -14,6 +25,16 @@
             :placeholder="uiProp['placeholder']"
             :style="uiStyle"
         ></a-input>
+        <div v-if="ui.type === 'group'">
+            <BoardElement
+                v-for="ui in groupComs"
+                :key="ui.id"
+                :ui="ui"
+                :workspace="workspace"
+                :board="prop.board"
+                :environment="prop.environment"
+            />
+        </div>
     </div>
 
     <a-modal title="选择卡片" v-model:visible="transfer.open_stat" @ok="transfer.comfirm">
@@ -31,11 +52,14 @@
 <script lang="ts">
 import { defineComponent, PropType, reactive, ref } from "vue";
 import { BoardUI, HandleBoardUIEvent, UICom } from "../api/workspace"
+import { DownOutlined, UpOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
     components: {
-
+        DownOutlined,
+        UpOutlined
     },
+    name: "BoardElement",
     props: {
         ui: {
             type: Object,
@@ -62,27 +86,6 @@ export default defineComponent({
 
         const uiProp = (ui as any).prop as any
         const uiStyle = (ui as any).style as any
-
-        //const sc = (propname: string, ...arg: string[][]) => {
-        //    const v = uiStyle[propname]
-        //
-        //    for (let i = 0; i < arg.length; i++) {
-        //        const [name, value] = arg[i];
-        //        if (name == v) return value
-        //    }
-        //    return ""
-        //}
-        //
-        //const css = (...names: string[]) => {
-        //    let classname = ""
-        //    for (let i = 0; i < names.length; i++) {
-        //        const c = names[i];
-        //        if (c && c != "") {
-        //            classname += c + " "
-        //        }
-        //    }
-        //    return classname
-        //}
 
         const textvalue = ref(uiProp['text'])
         const onTextChange = async () => {
@@ -123,11 +126,17 @@ export default defineComponent({
                 transfer.select = [...sourceSelectedKeys, ...targetSelectedKeys];
             }
         })
-
-
-
+        if (ui.type === "more") {
+            uiProp.isshow = JSON.parse(uiProp.isshow)
+        }
+        const groupComs = ref<UICom[] | null>(null)
+        if (ui.type === "group") {
+            groupComs.value = JSON.parse(uiProp["children"])
+            console.log(groupComs.value)
+            console.log(ui)
+        }
         // --------
-        return { ui, click, textvalue, onTextChange, uiProp, uiStyle, transfer }
+        return { prop, ui, click, textvalue, onTextChange, uiProp, uiStyle, transfer, groupComs }
     },
 })
 </script>
