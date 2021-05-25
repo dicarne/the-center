@@ -19,7 +19,7 @@
     <Row :gutter="[16, 16]">
         <Col :span="6">
             <div class="card-board card-body">
-                <a-button @click="createBoard">+</a-button>
+                <a-button @click="createBoard" style="margin-top: 15%;">+</a-button>
             </div>
         </Col>
         <Col v-for="item in list.boards" :key="item.id" :span="item.w">
@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { createVNode, defineComponent, onMounted, onUnmounted, PropType, reactive, ref } from "vue";
+import { createVNode, defineComponent, onMounted, onUnmounted, PropType, provide, reactive, ref } from "vue";
 import { Row, Col, Modal } from "ant-design-vue";
 import { BoardUI, CreateBoard, DeleteWorkspace, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, RenameWorkspace, SortBoards, WorkspaceDesc } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
@@ -92,6 +92,9 @@ export default defineComponent({
     },
     setup: (prop) => {
         const list = reactive({boards: [] as BoardUI[]});
+
+        const workspaceObj = ref(prop.workspaceObj)
+        provide("workspace", workspaceObj)
 
         const getboard = async () => {
             list.boards = (await GetBoards(prop.workspace)).filter(b => !b.hide);
@@ -203,6 +206,7 @@ export default defineComponent({
     border-radius: 8px;
     box-shadow: 0px 0px 10px #e6e6e6;
     position: relative;
+    min-height: 180px;
 }
 .card-board:hover {
     box-shadow: 0px 0px 10px #d3d3d3;

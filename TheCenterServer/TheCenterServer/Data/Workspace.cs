@@ -8,6 +8,13 @@ namespace TheCenterServer
         public string WName { get; set; }
         public string Id { get; set; }
         public List<BoardDesc> Boards { get; set; } = new();
+        public List<GroupBoardColor> Groups { get; set; } = new();
+    }
+
+    public class GroupBoardColor
+    {
+        public string name { get; set; }
+        public string color { get; set; }
     }
 
     /// <summary>
@@ -20,6 +27,7 @@ namespace TheCenterServer
         /// </summary>
         public string CardType { get; set; }
         public string CName { get; set; }
+        public string Group { get; set; }
         public string Id { get; set; }
         public Dictionary<string, string> Prop { get; set; } = new();
         public int W { get; set; } = 6;
@@ -32,7 +40,17 @@ namespace TheCenterServer
         public List<UICom> uIComs { get; set; } = new();
         public static BoardUI From(BoardDesc desc, List<UICom> uis)
         {
-            var bd = new BoardUI() { CardType = desc.CardType, CName = desc.CName, H = desc.H, Id = desc.Id, Prop = desc.Prop, W = desc.W, uIComs = uis };
+            var bd = new BoardUI()
+            {
+                CardType = desc.CardType,
+                CName = desc.CName,
+                H = desc.H,
+                Id = desc.Id,
+                Prop = desc.Prop,
+                W = desc.W,
+                uIComs = uis,
+                Group = desc.Group
+            };
             return bd;
         }
     }

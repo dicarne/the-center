@@ -68,6 +68,16 @@ export async function RenameBoard(wk: string, board: string, newname: string) {
   )
 }
 
+export async function SetBoardGroup(wk: string, board: string, newgroup: string) {
+
+  await connection.invoke(
+    "SetBoardGroup",
+    wk,
+    board,
+    newgroup
+  )
+}
+
 export async function StopServer() {
 
   await connection.invoke(
@@ -140,11 +150,17 @@ export interface Board {
   w: number;
   h: number;
   id: string;
+  group?: string
 }
 export interface WorkspaceDesc {
   wName: string;
   id: string;
   boards: Board[];
+  groups: GroupBoard[]
+}
+interface GroupBoard {
+  name: string
+  color: string
 }
 export interface BoardUI extends Board {
   uIComs: UICom[];

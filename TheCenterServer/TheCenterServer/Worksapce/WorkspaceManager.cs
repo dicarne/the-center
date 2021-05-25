@@ -255,7 +255,11 @@ namespace TheCenterServer
             desc.Boards.Find(d => d.Id == id)!.CName = newname;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
-
+        public void SetBoardGroup(string id, string newname)
+        {
+            desc.Boards.Find(d => d.Id == id)!.Group = newname;
+            ModuleManager.Ins.WorkspaceManager.Save();
+        }
         public ModuleBase? TryFindModule(string moduleType)
         {
             return modules.Find(m => m.Type == moduleType);

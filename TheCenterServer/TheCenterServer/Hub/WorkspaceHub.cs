@@ -141,6 +141,11 @@ namespace TheCenterServer
             ModuleManager.Ins.WorkspaceManager.Get(work).RenameBoard(board, newname);
         }
 
+        public void SetBoardGroup(string work, string board, string newname)
+        {
+            ModuleManager.Ins.WorkspaceManager.Get(work).SetBoardGroup(board, newname);
+        }
+
         public void SortBoards(string workspace, List<string> newids)
         {
             ModuleManager.Ins.WorkspaceManager.Get(workspace).SortBoards(newids);
