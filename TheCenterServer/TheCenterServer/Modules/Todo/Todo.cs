@@ -16,7 +16,7 @@ namespace TheCenterServer.PModule
         public Group todoItems = new();
         [UI]
         public Button addNewButton = new("+", onClick: "AddNewClick");
-        public override List<UICom> BuildInterface()
+        public async override Task<List<UICom>> BuildInterface()
         {
             todoItems.children(todos.Select(t => new Group().children(new List<UICom>() {
                 new CheckBox(t.active, onChange: "toggle").Flex("50px").ID("c:" + t.id),

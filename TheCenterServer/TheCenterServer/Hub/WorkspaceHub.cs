@@ -32,14 +32,14 @@ namespace TheCenterServer
             focusWorkspace.Remove(Context.ConnectionId);
         }
 
-        public List<BoardUI> GetBoards(string workspace)
+        public async Task<List<BoardUI>> GetBoards(string workspace)
         {
             var space = ModuleManager.Ins.WorkspaceManager.Get(workspace);
             var list = new List<BoardUI>();
             for (int i = 0; i < space.desc.Boards.Count; i++)
             {
                 list.Add(BoardUI.From(space.desc.Boards[i],
-                    space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
+                    await space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
             }
             return list;
         }

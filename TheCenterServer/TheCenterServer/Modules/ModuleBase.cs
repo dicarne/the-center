@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using LiteDB;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using static TheCenterServer.ModuleManager;
+using System.Runtime.CompilerServices;
 
 namespace TheCenterServer.PModule
 {
@@ -12,8 +14,9 @@ namespace TheCenterServer.PModule
     {
         public Workspace Workspace { get; set; }
         public BoardDesc BoardDesc { get; set; }
+        public PluginModuleConfig? config { get; set; }
         public string ID { get; set; }
-        public string Type { get; private set; }
+        public string Type { get; set; }
         /// <summary>
         /// 注册控件
         /// </summary>
@@ -33,7 +36,9 @@ namespace TheCenterServer.PModule
             var typeattr = type.GetCustomAttribute<PModuleAttribute>(false);
             if (typeattr == null)
             {
-                Console.WriteLine("[ERR] 类型名称不能为空。");
+                if (typeof(PluginModule) != type)
+                    Console.WriteLine("[ERR] 类型名称不能为空。");
+
             }
             else
             {
@@ -88,7 +93,7 @@ namespace TheCenterServer.PModule
         /// 提供给前端UI描述信息。
         /// </summary>
         /// <returns></returns>
-        public virtual List<UICom> BuildInterface()
+        public async virtual Task<List<UICom>> BuildInterface()
         {
             return new List<UICom>();
         }
@@ -109,7 +114,7 @@ namespace TheCenterServer.PModule
         /// <param name="eventname"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public object? HandleUIEvent(string control, string eventname, string[]? args = null)
+        public virtual object? HandleUIEvent(string control, string eventname, string[]? args = null)
         {
 
             if (controls.TryGetValue(control, out var ins))
@@ -205,7 +210,7 @@ namespace TheCenterServer.PModule
             return JsonSerializer.Serialize(dic);
         }
 
-        public void Recovery()
+        public virtual void Recovery()
         {
             var db = WorkspaceManager.DB;
             var col = db.GetCollection<ModuleSaveData>("ModuleData");

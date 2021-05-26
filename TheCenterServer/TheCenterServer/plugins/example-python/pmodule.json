@@ -1,0 +1,6 @@
+{
+    "main": "index.py",
+    "interpreter": "python3",
+    "singleton": true,
+    "port": 8899
+}

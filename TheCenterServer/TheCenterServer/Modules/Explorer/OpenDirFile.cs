@@ -84,7 +84,7 @@ namespace TheCenterServer.PModule
             });
         }
 
-        public override List<UICom> BuildInterface()
+        public async override Task<List<UICom>> BuildInterface()
         {
             var ui = new List<UICom>()
             {

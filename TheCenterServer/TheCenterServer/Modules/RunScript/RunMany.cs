@@ -67,7 +67,7 @@ namespace TheCenterServer.PModule
             return new Transfer.ShowData(available, all.ToList());
         }
 
-        public override List<UICom> BuildInterface()
+        public async override Task<List<UICom>> BuildInterface()
         {
             return new()
             {

@@ -24,8 +24,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "hotReloadProfile": "aspnetcore",
-      "dotnetRunMessages": "true",
-      //"applicationUrl": "http://localhost:5000"
+      "dotnetRunMessages": "true"
     }
   }
 }

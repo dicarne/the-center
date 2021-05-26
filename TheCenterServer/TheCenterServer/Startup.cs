@@ -29,12 +29,12 @@ namespace TheCenterServer
         {
 
             services.AddControllers();
-            /*
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TheCenterServer", Version = "v1" });
             });
-            */
+            
             services.AddSignalR();
             services.AddResponseCompression(opts =>
             {
@@ -62,8 +62,8 @@ namespace TheCenterServer
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //app.UseSwagger();
-                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TheCenterServer v1"));
+            /*    app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TheCenterServer v1"));*/
             }
 
             app.UseRouting();

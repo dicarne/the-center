@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TheCenterServer.PModule;
+using System.IO;
+using System.Text.Json;
+using Microsoft.VisualBasic;
 
 namespace TheCenterServer
 {
@@ -15,6 +18,7 @@ namespace TheCenterServer
         public void Init()
         {
             ScanAssembly(Assembly.GetExecutingAssembly());
+            LoadPluginModule();
             WorkspaceManager = new();
             WorkspaceManager.Recovery();
         }
@@ -31,13 +35,61 @@ namespace TheCenterServer
             }
         }
 
-        record ModuleType(string name, Type type);
+        void LoadPluginModule()
+        {
+            if (Directory.Exists("plugins"))
+            {
+                var alldir = Directory.GetDirectories("plugins");
+                foreach (var dir in alldir)
+                {
+
+                    if (File.Exists(Path.Combine(dir, "pmodule.json")))
+                    {
+                        try
+                        {
+                            var config = JsonSerializer.Deserialize<PluginModuleConfig>(File.ReadAllText(Path.Combine(dir, "pmodule.json")))!;
+                            if (config.type == null) config.type = dir;
+                            config.dir = dir;
+                            moduleLibrary[dir] = new ModuleType(config.name ?? dir, typeof(PluginModule), config);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory("plugins");
+            }
+        }
+
+        public class PluginModuleConfig
+        {
+            public string interpreter { get; set; }
+            public string main { get; set; }
+            public string name { get; set; }
+            public string type { get; set; }
+            public string dir { get; set; }
+            public bool singleton { get; set; }
+            public int port { get; set; }
+        }
+
+        record ModuleType(string name, Type type, PluginModuleConfig? config = null);
 
         Dictionary<string, ModuleType> moduleLibrary = new();
         public ModuleBase BuildFrom(string type)
         {
-            var t = moduleLibrary[type].type;
-            return Activator.CreateInstance(t) as ModuleBase;
+            var mt = moduleLibrary[type];
+            var t = mt.type;
+            var m = Activator.CreateInstance(t) as ModuleBase;
+            if(t == typeof(PluginModule))
+            {
+                m.config = mt.config;
+                m.Type = mt.config.type;
+            }
+            return m;
         }
         public record ModuleTypeNamePair(string type, string name);
         public List<ModuleTypeNamePair> GetModules()
