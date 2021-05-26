@@ -15,7 +15,7 @@ namespace TheCenterServer
         [UIParam("显示文本值。")]
         public Input text(string? newtext)
         {
-            UI!.Prop["text"] = newtext;
+            UI!.prop["text"] = newtext;
             return this;
         }
 
@@ -29,7 +29,7 @@ namespace TheCenterServer
         [UIParam("占位符文本。")]
         public Input placeholder(string? placeholderValue)
         {
-            UI!.Prop["placeholder"] = placeholderValue;
+            UI!.prop["placeholder"] = placeholderValue;
             return this;
         }
     }

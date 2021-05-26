@@ -36,10 +36,10 @@ namespace TheCenterServer
         {
             var space = ModuleManager.Ins.WorkspaceManager.Get(workspace);
             var list = new List<BoardUI>();
-            for (int i = 0; i < space.desc.Boards.Count; i++)
+            for (int i = 0; i < space.desc.boards.Count; i++)
             {
-                list.Add(BoardUI.From(space.desc.Boards[i],
-                    await space.modules.Find(m => m.ID == space.desc.Boards[i].Id).BuildInterface()));
+                list.Add(BoardUI.From(space.desc.boards[i],
+                    await space.modules.Find(m => m.ID == space.desc.boards[i].id).BuildInterface()));
             }
             return list;
         }
@@ -62,7 +62,7 @@ namespace TheCenterServer
         public string CreateWorkspace(string name)
         {
             var wk = ModuleManager.Ins.WorkspaceManager.Create(name);
-            return wk.desc.Id;
+            return wk.desc.id;
         }
 
         public void DeleteWorkspace(string id)

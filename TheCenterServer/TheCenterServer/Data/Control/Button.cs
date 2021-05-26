@@ -16,7 +16,7 @@ namespace TheCenterServer
         [UIParam("显示文本值。")]
         public Button text(string? newtext)
         {
-            UI!.Prop["text"] = newtext;
+            UI!.prop["text"] = newtext;
             return this;
         }
 
@@ -43,7 +43,7 @@ namespace TheCenterServer
         [UIParam("显示文本值。")]
         public Text text(string? newtext)
         {
-            UI!.Prop["text"] = newtext;
+            UI!.prop["text"] = newtext;
             return this;
         }
 
@@ -53,13 +53,13 @@ namespace TheCenterServer
             switch (textAlign)
             {
                 case TextAlign.center:
-                    UI!.Style["text-align"] = null;
+                    UI!.style["text-align"] = null;
                     break;
                 case TextAlign.left:
-                    UI!.Style["text-align"] = "left";
+                    UI!.style["text-align"] = "left";
                     break;
                 case TextAlign.right:
-                    UI!.Style["text-align"] = "right";
+                    UI!.style["text-align"] = "right";
                     break;
                 default:
                     break;

@@ -91,10 +91,10 @@ namespace TheCenterServer
             {
                 desc = new WorkspaceDesc()
                 {
-                    WName = workname,
-                    Id = Guid.NewGuid().ToString(),
+                    wName = workname,
+                    id = Guid.NewGuid().ToString(),
                     // TODO 模板
-                    Boards = new List<BoardDesc>()
+                    boards = new List<BoardDesc>()
                 }
             };
             Workspaces.Add(newwk);
@@ -105,7 +105,7 @@ namespace TheCenterServer
 
         public void Delete(string workid)
         {
-            var index = Workspaces.FindIndex(w => w.desc.Id == workid);
+            var index = Workspaces.FindIndex(w => w.desc.id == workid);
             if (index != -1) Workspaces.RemoveAt(index);
             Save();
         }
@@ -117,7 +117,7 @@ namespace TheCenterServer
 
         public Workspace Get(string workid)
         {
-            return Workspaces.Find(w => w.desc.Id == workid);
+            return Workspaces.Find(w => w.desc.id == workid);
         }
 
         public void Recovery()
@@ -191,16 +191,16 @@ namespace TheCenterServer
         public void Init()
         {
             modules = new();
-            foreach (var b in desc.Boards)
+            foreach (var b in desc.boards)
             {
                 // 根据类型创建对应模块实例
-                var m = ModuleManager.Ins.BuildFrom(b.CardType);
-                if (string.IsNullOrEmpty(b.Id))
+                var m = ModuleManager.Ins.BuildFrom(b.cardType);
+                if (string.IsNullOrEmpty(b.id))
                 {
-                    b.Id = Guid.NewGuid().ToString();
+                    b.id = Guid.NewGuid().ToString();
                 }
                 m.Workspace = this;
-                m.ID = b.Id;
+                m.ID = b.id;
 
                 modules.Add(m);
                 m.BoardDesc = b;
@@ -219,11 +219,11 @@ namespace TheCenterServer
                 m.Workspace = this;
                 var b = new BoardDesc()
                 {
-                    CardType = type,
-                    Id = m.ID,
-                    CName = m.GetType().GetCustomAttribute<PModuleAttribute>()?.ModuleName ?? "未命名"
+                    cardType = type,
+                    id = m.ID,
+                    cName = m.GetType().GetCustomAttribute<PModuleAttribute>()?.ModuleName ?? "未命名"
                 };
-                desc.Boards.Add(b);
+                desc.boards.Add(b);
                 m.BoardDesc = b;
                 m.OnFirstCreate();
                 m.OnLoad();
@@ -246,18 +246,18 @@ namespace TheCenterServer
                 item.OnDestroy();
             }
             modules.RemoveAll(b => b.ID == id);
-            desc.Boards.RemoveAll(b => b.Id == id);
+            desc.boards.RemoveAll(b => b.id == id);
             ModuleManager.Ins.WorkspaceManager.Save();
         }
 
         public void RenameBoard(string id, string newname)
         {
-            desc.Boards.Find(d => d.Id == id)!.CName = newname;
+            desc.boards.Find(d => d.id == id)!.cName = newname;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
         public void SetBoardGroup(string id, string newname)
         {
-            desc.Boards.Find(d => d.Id == id)!.Group = newname;
+            desc.boards.Find(d => d.id == id)!.group = newname;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
         public ModuleBase? TryFindModule(string moduleType)
@@ -270,15 +270,15 @@ namespace TheCenterServer
             var newarr = new List<BoardDesc>();
             foreach (var id in newids)
             {
-                newarr.Add(desc.Boards.Find(b => b.Id == id)!);
+                newarr.Add(desc.boards.Find(b => b.id == id)!);
             }
-            desc.Boards = newarr;
+            desc.boards = newarr;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
 
         public void Rename(string newname)
         {
-            desc.WName = newname;
+            desc.wName = newname;
             ModuleManager.Ins.WorkspaceManager.Save();
         }
     }

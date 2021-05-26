@@ -9,10 +9,10 @@ namespace TheCenterServer
     {
         public UICom? UI { get; protected set; }
         public readonly List<EventBind> EventBind = new();
-        public string Id { get => UI!.Id; set { UI!.Id = value; } }
+        public string Id { get => UI!.id; set { UI!.id = value; } }
         public UICom ID(string id)
         {
-            UI!.Id = id;
+            UI!.id = id;
             return this;
         }
         public UIControl bindEvent(string eventName, string? method)
@@ -20,7 +20,7 @@ namespace TheCenterServer
             if (method == null)
             {
                 EventBind.RemoveAll(e => e.eventname == eventName);
-                UI!.Event.Remove(eventName);
+                UI!.eventlist.Remove(eventName);
             }
             else
             {
@@ -28,7 +28,7 @@ namespace TheCenterServer
                 if (old == -1)
                 {
                     EventBind.Add(new(eventName, method));
-                    UI!.Event.Add(eventName);
+                    UI!.eventlist.Add(eventName);
                 }
                 else
                 {
@@ -49,21 +49,21 @@ namespace TheCenterServer
         [UIParam("行布局时的宽度。")]
         public UIControl Span(int span)
         {
-            UI!.Prop["span"] = JsonSerializer.Serialize(span);
+            UI!.prop["span"] = JsonSerializer.Serialize(span);
             return this;
         }
 
         [UIParam("行flex布局时的宽度。")]
         public UIControl Flex(string flexdata)
         {
-            UI!.Prop["flex"] = flexdata;
+            UI!.prop["flex"] = flexdata;
             return this;
         }
 
         [UIParam("直接设定样式。")]
         public UIControl Style(string stylename, string stylecontent)
         {
-            UI!.Style[stylename] = stylecontent;
+            UI!.style[stylename] = stylecontent;
             return this;
         }
     }

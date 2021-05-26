@@ -45,7 +45,7 @@ namespace TheCenterServer.PModule
                 Type = typeattr.ModuleType;
             }
 
-            var UIs = type.GetFields(flags).Where(p => p.GetValue(this).GetType().IsSubclassOf(typeof(UIControl)));
+            var UIs = type.GetFields(flags).Where(p => p.GetValue(this)?.GetType().IsSubclassOf(typeof(UIControl)) ?? false);
             foreach (var ui in UIs)
             {
                 var attr = ui.GetCustomAttributes(typeof(UIAttribute), true).FirstOrDefault();
@@ -182,7 +182,7 @@ namespace TheCenterServer.PModule
             {
                 col.Insert(new ModuleSaveData()
                 {
-                    workspace = Workspace.desc.Id,
+                    workspace = Workspace.desc.id,
                     board = ID,
                     data = GetSaveData()
                 });
@@ -192,7 +192,7 @@ namespace TheCenterServer.PModule
         bool Dirt { get; set; }
         protected void SyncUI()
         {
-            WorkspaceBackgroundService.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.Id, ID, BuildInterface());
+            WorkspaceBackgroundService.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.id, ID, BuildInterface());
         }
         protected void SetState(Action action)
         {
@@ -214,10 +214,10 @@ namespace TheCenterServer.PModule
         {
             var db = WorkspaceManager.DB;
             var col = db.GetCollection<ModuleSaveData>("ModuleData");
-            var old = col.FindOne(c => c.workspace == Workspace.desc.Id && c.board == ID);
+            var old = col.FindOne(c => c.workspace == Workspace.desc.id && c.board == ID);
             if (old == null)
             {
-                Console.WriteLine($"[WARN] 找不到{Workspace.desc.Id}.{ID}的记录。");
+                Console.WriteLine($"[WARN] 找不到{Workspace.desc.id}.{ID}的记录。");
                 return;
             }
             var data = JsonSerializer.Deserialize<Dictionary<string, string>>(old.data!);
@@ -243,7 +243,7 @@ namespace TheCenterServer.PModule
                 }
                 else
                 {
-                    Console.WriteLine($"[WARN] 找不到{Workspace.desc.Id}.{ID}.{item.Key}的记录。");
+                    Console.WriteLine($"[WARN] 找不到{Workspace.desc.id}.{ID}.{item.Key}的记录。");
                 }
             }
         }

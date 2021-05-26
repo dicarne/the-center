@@ -5,10 +5,10 @@ namespace TheCenterServer
 {
     public class WorkspaceDesc
     {
-        public string WName { get; set; }
-        public string Id { get; set; }
-        public List<BoardDesc> Boards { get; set; } = new();
-        public List<GroupBoardColor> Groups { get; set; } = new();
+        public string wName { get; set; }
+        public string id { get; set; }
+        public List<BoardDesc> boards { get; set; } = new();
+        public List<GroupBoardColor> groups { get; set; } = new();
     }
 
     public class GroupBoardColor
@@ -25,14 +25,14 @@ namespace TheCenterServer
         /// <summary>
         /// 卡片类型，通过此字符串实例化UI控件
         /// </summary>
-        public string CardType { get; set; }
-        public string CName { get; set; }
-        public string Group { get; set; }
-        public string Id { get; set; }
-        public Dictionary<string, string> Prop { get; set; } = new();
-        public int W { get; set; } = 6;
-        public int H { get; set; } = 1;
-        public bool Hide { get; set; } = false;
+        public string cardType { get; set; }
+        public string cName { get; set; }
+        public string group { get; set; }
+        public string id { get; set; }
+        public Dictionary<string, string> prop { get; set; } = new();
+        public int w { get; set; } = 6;
+        public int h { get; set; } = 1;
+        public bool hide { get; set; } = false;
     }
 
     public class BoardUI : BoardDesc
@@ -42,14 +42,14 @@ namespace TheCenterServer
         {
             var bd = new BoardUI()
             {
-                CardType = desc.CardType,
-                CName = desc.CName,
-                H = desc.H,
-                Id = desc.Id,
-                Prop = desc.Prop,
-                W = desc.W,
+                cardType = desc.cardType,
+                cName = desc.cName,
+                h = desc.h,
+                id = desc.id,
+                prop = desc.prop,
+                w = desc.w,
                 uIComs = uis,
-                Group = desc.Group
+                group = desc.group
             };
             return bd;
         }
@@ -57,11 +57,11 @@ namespace TheCenterServer
 
     public class UICom
     {
-        public string Id { get; set; }
+        public string id { get; set; }
         public string type { get; set; }
-        public Dictionary<string, string?> Style { get; set; } = new();
-        public Dictionary<string, string?> Prop { get; set; } = new();
-        public List<string> Event { get; set; } = new();
+        public Dictionary<string, string?> style { get; set; } = new();
+        public Dictionary<string, string?> prop { get; set; } = new();
+        public List<string> eventlist { get; set; } = new();
         public UICom() { }
         public UICom(string type) { this.type = type; }
     }

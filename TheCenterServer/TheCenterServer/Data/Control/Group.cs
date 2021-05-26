@@ -16,7 +16,7 @@ namespace TheCenterServer
         [UIParam("子组件。")]
         public Group children(List<UICom> childs)
         {
-            UI!.Prop["children"] = JsonSerializer.Serialize(childs, new JsonSerializerOptions()
+            UI!.prop["children"] = JsonSerializer.Serialize(childs, new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
@@ -26,7 +26,7 @@ namespace TheCenterServer
         [UIParam("水平布局。")]
         public Group Horizon(bool hor)
         {
-            UI!.Prop["hor"] = hor ? "true" : "false";
+            UI!.prop["hor"] = hor ? "true" : "false";
             return this;
         }
 
@@ -38,7 +38,7 @@ namespace TheCenterServer
             {
                 s.Add(ver_value.Value);
             }
-            UI!.Prop["spacing"] = JsonSerializer.Serialize(s);
+            UI!.prop["spacing"] = JsonSerializer.Serialize(s);
             return this;
         }
     }

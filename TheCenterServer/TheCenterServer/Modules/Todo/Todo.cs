@@ -115,7 +115,7 @@ namespace TheCenterServer.PModule
 
         public override Task OnLoad()
         {
-            BoardDesc.W = 11;
+            BoardDesc.w = 11;
             return base.OnLoad();
         }
     }

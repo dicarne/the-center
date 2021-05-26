@@ -28,7 +28,7 @@ namespace TheCenterServer
         [UIParam("显示文本值。")]
         public Transfer text(string? newtext)
         {
-            UI!.Prop["text"] = newtext;
+            UI!.prop["text"] = newtext;
             return this;
         }
 
@@ -44,21 +44,21 @@ namespace TheCenterServer
         [UIParam("选中有效的列表。")]
         public Transfer avaliable(List<string> newtext)
         {
-            UI!.Prop["avaliable"] = JsonSerializer.Serialize(newtext);
+            UI!.prop["avaliable"] = JsonSerializer.Serialize(newtext);
             return this;
         }
 
         [UIParam("备选的列表。")]
         public Transfer all(List<string> newtext)
         {
-            UI!.Prop["all"] = JsonSerializer.Serialize(newtext);
+            UI!.prop["all"] = JsonSerializer.Serialize(newtext);
             return this;
         }
 
         [UIParam("特殊类型。可选null，local_boards")]
         public Transfer type(string? newtext)
         {
-            UI!.Prop["type"] = newtext;
+            UI!.prop["type"] = newtext;
             return this;
         }
     }

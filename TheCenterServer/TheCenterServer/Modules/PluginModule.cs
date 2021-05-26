@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using StackExchange.Profiling;
+using StackExchange.Profiling.Internal;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -18,10 +22,11 @@ namespace TheCenterServer.PModule
         }
 
         static Dictionary<string, ChildModule> childrens = new();
-
+        Process process;
         void Run()
         {
             Process pro = new Process();
+            process = pro;
             pro.StartInfo.FileName = config.interpreter;
             pro.StartInfo.Arguments = config.main;
             pro.StartInfo.WorkingDirectory = config.dir;
@@ -40,20 +45,20 @@ namespace TheCenterServer.PModule
                     try
                     {
                         pro.Start();
+                        
                         pro.Exited += (o, e) =>
                         {
-                            var c = childrens[config.type];
-                            c.count--;
-                            if (c.count == 0)
-                            {
-                                childrens.Remove(config.type);
-                            }
+                            Console.WriteLine(e.ToJson());
                         };
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
                     }
+                }
+                else
+                {
+                    process = childrens[config.type].process;
                 }
                 c.count++;
             }
@@ -62,13 +67,29 @@ namespace TheCenterServer.PModule
                 try
                 {
                     pro.Start();
+
+
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
+            InitModule();
 
+        }
+
+
+        void InitModule()
+        {
+            client.PostAsJsonAsync(url + $"/init?work={Workspace.desc.id}&board={BoardDesc.id}", BoardDesc)
+                .ContinueWith(resp =>
+                {
+                    if (!resp.Result.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine(resp);
+                    }
+                });
         }
 
         class ChildModule
@@ -77,20 +98,24 @@ namespace TheCenterServer.PModule
             public int count { get; set; }
             public ModuleManager.PluginModuleConfig config { get; set; }
         }
-        string url => $"http://localhost:{config.port}/interface?work={Workspace.desc.Id}&board={BoardDesc.Id}&ui={ID}";
+        string url => $"http://127.0.0.1:{config.port}";
 
+        static HttpClient client = new HttpClient();
         public async override Task<List<UICom>> BuildInterface()
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync(url);
+            Console.WriteLine(process.HasExited);
+#if DEBUG
+            InitModule();
+#endif
+            var response = await client.GetAsync(url + $"/interface?work={Workspace.desc.id}&board={BoardDesc.id}&ui={ID}");
             var content = await response.Content.ReadAsStringAsync();
             try
             {
-                Console.WriteLine(content);
-                return JsonSerializer.Deserialize<List<UICom>>(content, new JsonSerializerOptions()
+                var r = JsonSerializer.Deserialize<List<UICom>>(content, new JsonSerializerOptions()
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 })!;
+                return r;
             }
             catch (Exception e)
             {
@@ -99,14 +124,23 @@ namespace TheCenterServer.PModule
             }
         }
 
+        class UIEventReq
+        {
+            public string control { get; set; }
+            public string eventname { get; set; }
+            public string[]? args { get; set; }
+        }
         public override object? HandleUIEvent(string control, string eventname, string[]? args = null)
         {
-            return base.HandleUIEvent(control, eventname, args);
-        }
-
-        public override void OnCustomEvent(string control, string eventName, string[]? args = null)
-        {
-            base.OnCustomEvent(control, eventName, args);
+            var response = client.PostAsJsonAsync(url + $"/uievent?work={Workspace.desc.id}&board={BoardDesc.id}&ui={ID}",
+                new UIEventReq
+                {
+                    control = control,
+                    eventname = eventname,
+                    args = args
+                }
+            );
+            return null;
         }
     }
 }

@@ -172,7 +172,7 @@ export interface UICom {
   type: string;
   style: Object;
   prop: any;
-  event: string[];
+  eventlist: string[];
 }
 
 

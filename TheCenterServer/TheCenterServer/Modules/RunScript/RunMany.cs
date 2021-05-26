@@ -63,7 +63,7 @@ namespace TheCenterServer.PModule
         public Transfer.ShowData onShow()
         {
             unavailable.Clear();
-            var all = Workspace.desc.Boards.Select(b => b.Id);
+            var all = Workspace.desc.boards.Select(b => b.id);
             return new Transfer.ShowData(available, all.ToList());
         }
 

@@ -17,14 +17,14 @@ namespace TheCenterServer
         [UIParam("显示文本值。")]
         public More text(string? newtext)
         {
-            UI!.Prop["text"] = newtext;
+            UI!.prop["text"] = newtext;
             return this;
         }
 
         [UIParam("是否显示详情值。")]
         public More isshow(bool newtext)
         {
-            UI!.Prop["isshow"] = newtext ? "true" : "false";
+            UI!.prop["isshow"] = newtext ? "true" : "false";
             return this;
         }
 

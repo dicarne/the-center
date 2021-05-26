@@ -16,7 +16,7 @@ namespace TheCenterServer
         [UIParam("设置是否选中")]
         public CheckBox Value(bool value)
         {
-            UI!.Prop["value"] = value ? "true" : "false";
+            UI!.prop["value"] = value ? "true" : "false";
             return this;
         }
 

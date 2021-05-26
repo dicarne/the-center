@@ -1,43 +1,25 @@
-from typing import Dict, List
-from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
-from starlette.responses import JSONResponse
-import uvicorn
+from TheCenterAPI.APIServer import PModule, Run, reg_module
+from TheCenterAPI.BaseUICom import Button, Text
 
-app = FastAPI()
-
-
-@app.get('/')
-def index():
-    return {'message': '你已经正确创建 FastApi 服务！'}
-
+f = open("test.txt", "w")
+f.writelines("run!")
+f.flush()
 
 if __name__ == "__main__":
-    uvicorn.run("index:app", host="0.0.0.0", port=8899, reload=True)
+    Run()
 
-
-@app.get("/interface")
-def buildInterface():
+class HelloPythonModule(PModule):
     hello = Text("textUI", "Hello Python!")
-    print(jsonable_encoder(hello))
-    return JSONResponse(content=jsonable_encoder([hello]))
 
+    button = Button("clickMe").text("点我Hello").onClick("OnClick")
 
-class UICom:
-    id: str
-    type: str
-    style: Dict[str, str]
-    prop: Dict[str, str]
-    event: List[str]
-    def __init__(self) -> None:
-        self.style = {}
-        self.prop = {}
-        self.event = {}
+    def buildInterface(self):
+        return [self.hello.ui, self.button.ui, Button("111").text("dynamic").onClick("c:111").ui]
 
+    def OnClick(self):
+        print("Click!")
 
-class Text(UICom):
-    def __init__(self, id, text) -> None:
-        super().__init__()
-        self.type = "text"
-        self.id = id
-        self.prop['text'] = text
+    def customEvent(self, control, eventname, args):
+        print(control)
+
+reg_module("#", HelloPythonModule)
