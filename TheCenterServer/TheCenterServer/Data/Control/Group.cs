@@ -22,5 +22,24 @@ namespace TheCenterServer
             });
             return this;
         }
+
+        [UIParam("水平布局。")]
+        public Group Horizon(bool hor)
+        {
+            UI!.Prop["hor"] = hor ? "true" : "false";
+            return this;
+        }
+
+        [UIParam("间距。")]
+        public Group Spacing(float hor_value, float? ver_value = null)
+        {
+            var s = new List<float> { hor_value };
+            if(ver_value.HasValue)
+            {
+                s.Add(ver_value.Value);
+            }
+            UI!.Prop["spacing"] = JsonSerializer.Serialize(s);
+            return this;
+        }
     }
 }

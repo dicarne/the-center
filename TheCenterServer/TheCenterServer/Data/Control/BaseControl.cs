@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text.Json;
 
 namespace TheCenterServer
 {
@@ -10,6 +10,11 @@ namespace TheCenterServer
         public UICom? UI { get; protected set; }
         public readonly List<EventBind> EventBind = new();
         public string Id { get => UI!.Id; set { UI!.Id = value; } }
+        public UICom ID(string id)
+        {
+            UI!.Id = id;
+            return this;
+        }
         public UIControl bindEvent(string eventName, string? method)
         {
             if (method == null)
@@ -39,6 +44,27 @@ namespace TheCenterServer
         public UIControl(string type)
         {
             UI = new UICom(type);
+        }
+
+        [UIParam("行布局时的宽度。")]
+        public UIControl Span(int span)
+        {
+            UI!.Prop["span"] = JsonSerializer.Serialize(span);
+            return this;
+        }
+
+        [UIParam("行flex布局时的宽度。")]
+        public UIControl Flex(string flexdata)
+        {
+            UI!.Prop["flex"] = flexdata;
+            return this;
+        }
+
+        [UIParam("直接设定样式。")]
+        public UIControl Style(string stylename, string stylecontent)
+        {
+            UI!.Style[stylename] = stylecontent;
+            return this;
         }
     }
 

@@ -200,7 +200,7 @@ export default defineComponent({
 }
 .card-body {
     background-color: #fff;
-    padding: 24px;
+    padding: 28px 10px 18px 10px;
 }
 .card-board {
     border-radius: 8px;

@@ -1,11 +1,16 @@
 <template>
-    <div class="board-element">
+    <div :class="prop.deep === 0 ? 'board-element' : ''">
         <a-button
             v-if="ui.type === 'transfer'"
             @click="transfer.open"
             :style="uiStyle"
         >{{ textvalue }}</a-button>
         <a-button v-if="ui.type === 'button'" @click="click" :style="uiStyle">{{ textvalue }}</a-button>
+        <a-checkbox
+            v-if="ui.type === 'checkBox'"
+            v-model:checked="checkBoxValue"
+            @change="checkBoxChange"
+        ></a-checkbox>
         <a
             v-if="ui.type === 'more'"
             @click="click"
@@ -26,28 +31,51 @@
             :style="uiStyle"
         ></a-input>
         <div v-if="ui.type === 'group'">
-            <BoardElement
-                v-for="ui in groupComs"
-                :key="ui.id"
-                :ui="ui"
-                :workspace="workspace"
-                :board="prop.board"
-                :environment="prop.environment"
-            />
+            <a-row
+                v-if="uiProp['hor'] == 'true'"
+                :align="'middle'"
+                :gutter="JSON.parse(uiProp['spacing'] || '0')"
+            >
+                <a-col
+                    v-for="ui in groupComs"
+                    :span="ui.prop['span'] ? JSON.parse(uiProp['span']) : undefined"
+                    :flex="ui.prop['flex']"
+                >
+                    <BoardElement
+                        :key="ui.id"
+                        :ui="ui"
+                        :workspace="workspace"
+                        :board="prop.board"
+                        :environment="prop.environment"
+                        :deep="prop.deep + 1"
+                    />
+                </a-col>
+            </a-row>
+            <div v-else>
+                <BoardElement
+                    v-for="ui in groupComs"
+                    :key="ui.id"
+                    :ui="ui"
+                    :workspace="workspace"
+                    :board="prop.board"
+                    :environment="prop.environment"
+                    :deep="prop.deep + 1"
+                />
+            </div>
         </div>
-    </div>
 
-    <a-modal title="选择卡片" v-model:visible="transfer.open_stat" @ok="transfer.comfirm">
-        <a-transfer
-            :data-source="transfer.list"
-            :titles="['备选', '运行']"
-            :target-keys="transfer.tar"
-            :selected-keys="transfer.select"
-            :render="transfer.render"
-            @change="transfer.handleChange"
-            @selectChange="transfer.handleSelectChange"
-        />
-    </a-modal>
+        <a-modal title="选择卡片" v-model:visible="transfer.open_stat" @ok="transfer.comfirm">
+            <a-transfer
+                :data-source="transfer.list"
+                :titles="['备选', '运行']"
+                :target-keys="transfer.tar"
+                :selected-keys="transfer.select"
+                :render="transfer.render"
+                @change="transfer.handleChange"
+                @selectChange="transfer.handleSelectChange"
+            />
+        </a-modal>
+    </div>
 </template>
 <script lang="ts">
 import { defineComponent, PropType, reactive, ref } from "vue";
@@ -76,7 +104,11 @@ export default defineComponent({
         environment: {
             type: Object as PropType<{ boards: BoardUI[] }>,
             required: true
-        }
+        },
+        deep: {
+            type: Number,
+            required: true,
+        },
     },
     setup: (prop) => {
         const ui = prop.ui as UICom
@@ -132,11 +164,18 @@ export default defineComponent({
         const groupComs = ref<UICom[] | null>(null)
         if (ui.type === "group") {
             groupComs.value = JSON.parse(uiProp["children"])
-            console.log(groupComs.value)
-            console.log(ui)
         }
         // --------
-        return { prop, ui, click, textvalue, onTextChange, uiProp, uiStyle, transfer, groupComs }
+        const checkBoxValue = ref(false)
+        if (ui.type === "checkBox") {
+            checkBoxValue.value = uiProp["value"] === "true" ? true : false
+        }
+        const checkBoxChange = async () => {
+            await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, "onChange", [JSON.stringify(checkBoxValue.value)])
+        }
+        //console.log(uiProp)
+        // --------
+        return { prop, ui, click, textvalue, onTextChange, uiProp, uiStyle, transfer, groupComs, checkBoxValue, checkBoxChange }
     },
 })
 </script>

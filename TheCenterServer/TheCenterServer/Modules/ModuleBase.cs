@@ -111,7 +111,7 @@ namespace TheCenterServer.PModule
         /// <returns></returns>
         public object? HandleUIEvent(string control, string eventname, string[]? args = null)
         {
-           
+
             if (controls.TryGetValue(control, out var ins))
             {
                 var eventbind = ins.EventBind.FirstOrDefault(e => e.eventname == eventname);
@@ -120,16 +120,26 @@ namespace TheCenterServer.PModule
                     var method = eventbind.method;
                     if (methods.TryGetValue(method, out var minfo))
                     {
-                        
+
                         return minfo.Invoke(this, args);
                     }
                     else
                     {
+
                         Console.WriteLine($"[ERR] 找不到绑定方法{control}.{eventname}.{method}。");
                     }
                 }
             }
+            else
+            {
+                OnCustomEvent(control, eventname!, args);
+            }
             return null;
+        }
+
+        public virtual void OnCustomEvent(string control, string eventName, string[]? args = null)
+        {
+
         }
 
         class ModuleSaveData
@@ -146,7 +156,7 @@ namespace TheCenterServer.PModule
             var col = db.GetCollection<ModuleSaveData>("ModuleData");
             col.EnsureIndex(d => d.board);
             var old = col.FindOne(c => c.board == ID);
-            if(old != null)
+            if (old != null)
             {
                 col.Delete(old._id);
             }

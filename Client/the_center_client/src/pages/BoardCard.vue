@@ -10,6 +10,7 @@
                 :workspace="workspace"
                 :board="boardid"
                 :environment="env"
+                :deep="0"
             />
         </div>
     </div>
