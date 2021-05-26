@@ -10,7 +10,7 @@ app = FastAPI()
 def Run():
     config = json.load(open("pmodule.json"))
     uvicorn.run("TheCenterAPI.APIServer:app",
-                host="0.0.0.0", port=config["port"], reload=True)
+                host="127.0.0.1", port=config["port"], reload=True)
     
 
 
@@ -19,14 +19,12 @@ class PModule:
     workspaceID: str
     board: BoardDesc
     def HandleUIEvent(self, body: UIEventReqBody):
-        print(body.eventname)
-        
         if hasattr(self, body.control):
-            ui = self[body.control]
+            ui = getattr(self, body.control)
             if body.args:
-                self[ui.events[body.eventname]](*body.args)
+                getattr(self, ui.events[body.eventname])(*body.args)
             else:
-                self[ui.events[body.eventname]]()
+                getattr(self, ui.events[body.eventname])()
         else:
             self.customEvent(body.control, body.eventname, body.args)
 

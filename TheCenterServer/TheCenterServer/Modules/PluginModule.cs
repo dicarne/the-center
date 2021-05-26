@@ -4,6 +4,7 @@ using StackExchange.Profiling.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,8 +31,14 @@ namespace TheCenterServer.PModule
             pro.StartInfo.FileName = config.interpreter;
             pro.StartInfo.Arguments = config.main;
             pro.StartInfo.WorkingDirectory = config.dir;
-            pro.StartInfo.UseShellExecute = true;
-            pro.StartInfo.CreateNoWindow = true;
+            pro.StartInfo.UseShellExecute = false;
+            pro.StartInfo.CreateNoWindow = false;
+
+            pro.StartInfo.RedirectStandardOutput = true;
+            pro.OutputDataReceived += (o, e) =>
+            {
+                File.AppendAllTextAsync(Path.Combine(config.dir, "log.log"), (e.Data ?? "") + "\n");
+            };
             if (config.singleton)
             {
                 childrens.Add(config.type, new ChildModule()
@@ -45,7 +52,7 @@ namespace TheCenterServer.PModule
                     try
                     {
                         pro.Start();
-                        
+                        pro.BeginOutputReadLine();
                         pro.Exited += (o, e) =>
                         {
                             Console.WriteLine(e.ToJson());
@@ -103,7 +110,6 @@ namespace TheCenterServer.PModule
         static HttpClient client = new HttpClient();
         public async override Task<List<UICom>> BuildInterface()
         {
-            Console.WriteLine(process.HasExited);
 #if DEBUG
             InitModule();
 #endif
