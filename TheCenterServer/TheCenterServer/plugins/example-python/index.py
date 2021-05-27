@@ -1,10 +1,10 @@
-from TheCenterAPI.APIServer import PModule, Run, data, reg_module, ui
+from TheCenterAPI.APIServer import Module, PModule, Run, data, reg_module, ui
 from TheCenterAPI.BaseUICom import Button, Input, Text
 
 if __name__ == "__main__":
     Run()
     
-
+@Module
 class HelloPythonModule(PModule):
 
     @ui
@@ -45,7 +45,3 @@ class HelloPythonModule(PModule):
     def onLoad(self):
         self.ensureValue([["count", 0], ["inputtext", ""]])
 
-    
-
-
-reg_module("#", HelloPythonModule)

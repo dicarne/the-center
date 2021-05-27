@@ -39,7 +39,7 @@ class PModule:
         else:
             self.customEvent(body.control, body.eventname, body.args)
 
-    def buildInterface():
+    def buildInterface(self):
         pass
 
     def customEvent(self, control, eventname, args):
@@ -174,3 +174,14 @@ def ensure_active(work: str, board: str):
 
 def reg_module(typeName: str, type):
     _reg_module[typeName] = type
+
+def Module(module: PModule):
+    def moduleName(name):
+        reg_module(name, module)
+        return module
+    return moduleName
+
+def Module(module: PModule):
+    reg_module("#", module)
+    return module
+
