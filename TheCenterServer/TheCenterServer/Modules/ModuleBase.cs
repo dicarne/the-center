@@ -190,9 +190,9 @@ namespace TheCenterServer.PModule
             Dirt = false;
         }
         bool Dirt { get; set; }
-        protected void SyncUI()
+        public async void SyncUI()
         {
-            WorkspaceBackgroundService.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.id, ID, BuildInterface());
+            WorkspaceBackgroundService.Ins.SendUIToClient(Workspace.ConnectID, Workspace.desc.id, ID, await BuildInterface());
         }
         protected void SetState(Action action)
         {

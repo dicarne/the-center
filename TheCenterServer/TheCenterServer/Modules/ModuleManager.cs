@@ -37,31 +37,34 @@ namespace TheCenterServer
 
         void LoadPluginModule()
         {
+            var rootPath = "";
             if (Directory.Exists("plugins"))
             {
-                var alldir = Directory.GetDirectories("plugins");
-                foreach (var dir in alldir)
+                rootPath = "plugins";
+            }else if(Directory.Exists(Path.Combine("resources", "plugins")))
+            {
+                rootPath = Path.Combine("resources", "plugins");
+            }else if(Directory.Exists(Path.Combine("resources", "server", "plugins")))
+            {
+                rootPath = Path.Combine("resources", "server", "plugins");
+            }
+            var alldir = Directory.GetDirectories(rootPath);
+            foreach (var dir in alldir)
+            {
+                if (File.Exists(Path.Combine(dir, "pmodule.json")))
                 {
-
-                    if (File.Exists(Path.Combine(dir, "pmodule.json")))
+                    try
                     {
-                        try
-                        {
-                            var config = JsonSerializer.Deserialize<PluginModuleConfig>(File.ReadAllText(Path.Combine(dir, "pmodule.json")))!;
-                            if (config.type == null) config.type = dir;
-                            config.dir = dir;
-                            moduleLibrary[dir] = new ModuleType(config.name ?? dir, typeof(PluginModule), config);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
+                        var config = JsonSerializer.Deserialize<PluginModuleConfig>(File.ReadAllText(Path.Combine(dir, "pmodule.json")))!;
+                        if (config.type == null) config.type = dir;
+                        config.dir = dir;
+                        moduleLibrary[dir] = new ModuleType(config.name ?? config.type, typeof(PluginModule), config);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                     }
                 }
-            }
-            else
-            {
-                Directory.CreateDirectory("plugins");
             }
         }
 

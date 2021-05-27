@@ -6,10 +6,10 @@ class GroupBoardColor:
     color: str
 
 class BoardDesc(BaseModel):
-    cardType: str
-    cName: str
+    cardType: str = ""
+    cName: str = ""
     group: Optional[str]
-    id: str
+    id: str = ""
     prop: Dict[str, str] = {}
     w: int = 6
     h: int = 1

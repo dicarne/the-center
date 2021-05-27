@@ -46,7 +46,7 @@ export default defineComponent({
                     serverAlive.value = false
                 }
 
-            }, 1000)
+            }, 200)
         })
         onUnmounted(() => {
             if (pingTimer.value != null) {

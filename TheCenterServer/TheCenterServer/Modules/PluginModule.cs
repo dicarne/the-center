@@ -16,6 +16,8 @@ namespace TheCenterServer.PModule
 {
     public class PluginModule : ModuleBase
     {
+        [Persistence]
+        public Dictionary<string, string> Data { get; set; } = new();
         public override Task OnLoad()
         {
             Run();
@@ -86,17 +88,13 @@ namespace TheCenterServer.PModule
 
         }
 
-
-        void InitModule()
+        bool init = false;
+        Task<HttpResponseMessage> initTask;
+        async Task InitModule()
         {
-            client.PostAsJsonAsync(url + $"/init?work={Workspace.desc.id}&board={BoardDesc.id}", BoardDesc)
-                .ContinueWith(resp =>
-                {
-                    if (!resp.Result.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine(resp);
-                    }
-                });
+            if (init) return;
+            await client.PostAsJsonAsync(url + $"/init?work={Workspace.desc.id}&board={BoardDesc.id}", BoardDesc);
+            init = true;
         }
 
         class ChildModule
@@ -110,9 +108,6 @@ namespace TheCenterServer.PModule
         static HttpClient client = new HttpClient();
         public async override Task<List<UICom>> BuildInterface()
         {
-#if DEBUG
-            InitModule();
-#endif
             var response = await client.GetAsync(url + $"/interface?work={Workspace.desc.id}&board={BoardDesc.id}&ui={ID}");
             var content = await response.Content.ReadAsStringAsync();
             try

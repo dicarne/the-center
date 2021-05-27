@@ -11,13 +11,19 @@ class HelloPythonModule(PModule):
     clickMe = Button("clickMe").text("点我Hello").onClick("OnClick")
 
     def buildInterface(self):
-        return [self.hello.ui, self.clickMe.ui, Button("111").text("dynamic").onClick("c:111").ui]
+        self.hello.text(str(self.getValue("count")))
+        return [self.hello.ui, self.clickMe.ui]
 
     def OnClick(self):
         print("Click!")
-        print("hello")
+        self.ensureValue([["count", 0]])
+        self.setValue("count", self.getValue("count") + 1)
+        self.syncUI()
 
     def customEvent(self, control, eventname, args):
         print(control)
+    
+    def onLoad(self):
+        self.ensureValue([["count", 0]])
 
 reg_module("#", HelloPythonModule)
