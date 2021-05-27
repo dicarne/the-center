@@ -23,7 +23,7 @@ class UICom:
 
 class UIBase:
     ui: UICom
-    events: Dict[str, str]
+    events: Dict[str, Any]
     def __init__(self, type) -> None:
         self.ui = UICom(type)
         self.events = {}

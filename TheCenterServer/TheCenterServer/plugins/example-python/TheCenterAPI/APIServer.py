@@ -25,13 +25,17 @@ class PModule:
     values: Dict[str, Any] = {}
     _uis: Dict[str, UIBase] = {}
 
+    def __init__(self) -> None:
+        self.values = {}
+        self._uis = {}
+
     def HandleUIEvent(self, body: UIEventReqBody):
         if body.control in self._uis:
             ui = self._uis[body.control]
             if body.args:
-                getattr(self, ui.events[body.eventname])(*body.args)
+                ui.events[body.eventname](*body.args)
             else:
-                getattr(self, ui.events[body.eventname])()
+                ui.events[body.eventname]()
         else:
             self.customEvent(body.control, body.eventname, body.args)
 
@@ -42,9 +46,6 @@ class PModule:
         pass
 
     def _getValue(self, key: str, force: bool = False):
-        # if not force:
-        #    if key in self.values:
-        #        return self.values[key]
         req = requests.get(URL + "GetValue?work="+self.workspaceID +
                            "&board="+self.board.id+"&key="+key)
         v = req.json()["value"]
@@ -69,36 +70,46 @@ class PModule:
     def onLoad(self):
         pass
 
+
 def data(func):
     name = func.__name__
+
     def getv(self2: PModule):
         return self2._getValue(name)
+
     def setv(self2: PModule, newv):
         self2._setValue(name, newv)
+
     def delv(self2):
         pass
     return property(getv, setv, delv, name)
 
+
 def ui(initfunc):
     name = initfunc.__name__
+
     def getv(self2: PModule):
         if name in self2._uis:
             return self2._uis[name]
         else:
-            init = initfunc()
+            init = initfunc(self2)
             init.set_id(name)
             self2._uis[name] = init
             return init
+
     def setv(self2: PModule, newv):
+
         if name in self2._uis:
             self2._uis[name] = newv
         else:
-            init = initfunc()
+            init = initfunc(self2)
             init.set_id(name)
             self2._uis[name] = newv
+
     def delv(self2):
         pass
     return property(getv, setv, delv, name)
+
 
 class WorlspaceIns:
     workspace: WorkspaceDesc
@@ -113,7 +124,8 @@ _reg_module: Dict[str, Any] = {}
 
 
 @app.post("/uievent")
-def uievent(body: UIEventReqBody, work: str, board: str, ui: str):
+def uievent(body: UIEventReqBody, work: str, board: str):
+    ensure_active(work, board)
     _workspaces[work].boards[board].HandleUIEvent(body)
 
 
@@ -140,6 +152,10 @@ def init(work: str, board: str, boardBody: BoardDesc):
 
 @app.get("/interface")
 def interface(work: str, board: str):
+    ensure_active(work, board)
+    return _workspaces[work].boards[board].buildInterface()
+
+def ensure_active(work: str, board: str):
     if work not in _workspaces or board not in _workspaces[work].boards:
         req = requests.get(URL+"GetBoardDesc?work="+work +
                            "&board="+board)
@@ -154,9 +170,7 @@ def interface(work: str, board: str):
         desc.prop = body["prop"]
         desc.w = body["w"]
         init(work, board, desc)
-
-    return _workspaces[work].boards[board].buildInterface()
-
+        _workspaces[work].boards[board].buildInterface()
 
 def reg_module(typeName: str, type):
     _reg_module[typeName] = type

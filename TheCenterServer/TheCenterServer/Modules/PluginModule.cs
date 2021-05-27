@@ -37,7 +37,7 @@ namespace TheCenterServer.PModule
             pro.StartInfo.CreateNoWindow = false;
 
             pro.StartInfo.RedirectStandardOutput = true;
-            pro.StartInfo.RedirectStandardError = true;
+            //pro.StartInfo.RedirectStandardError = true;
             pro.OutputDataReceived += (o, e) =>
             {
                 File.AppendAllTextAsync(Path.Combine(config.dir, "log.log"), (e.Data ?? "") + "\n");
@@ -47,22 +47,30 @@ namespace TheCenterServer.PModule
                 }
                 
             };
-            pro.ErrorDataReceived += (o, e) =>
+            /*pro.ErrorDataReceived += (o, e) =>
             {
                 File.AppendAllTextAsync(Path.Combine(config.dir, "error.log"), (e.Data ?? "") + "\n");
                 if (e.Data.HasValue() && !e.Data!.StartsWith("INFO:"))
                 {
                     Console.WriteLine(e.Data + "\n");
                 }
-            };
+            };*/
 
             if (config.singleton)
             {
-                childrens.Add(config.type, new ChildModule()
+                if (childrens.ContainsKey(config.type))
                 {
-                    process = pro,
-                    config = config
-                });
+
+                }
+                else
+                {
+                    childrens.Add(config.type, new ChildModule()
+                    {
+                        process = pro,
+                        config = config
+                    });
+                }
+
                 var c = childrens[config.type];
                 if (c.count == 0)
                 {
@@ -123,7 +131,7 @@ namespace TheCenterServer.PModule
         static HttpClient client = new HttpClient();
         public async override Task<List<UICom>> BuildInterface()
         {
-            var response = await client.GetAsync(url + $"/interface?work={Workspace.desc.id}&board={BoardDesc.id}&ui={ID}");
+            var response = await client.GetAsync(url + $"/interface?work={Workspace.desc.id}&board={BoardDesc.id}");
             var content = await response.Content.ReadAsStringAsync();
             try
             {
@@ -148,7 +156,7 @@ namespace TheCenterServer.PModule
         }
         public override object? HandleUIEvent(string control, string eventname, string[]? args = null)
         {
-            var response = client.PostAsJsonAsync(url + $"/uievent?work={Workspace.desc.id}&board={BoardDesc.id}&ui={ID}",
+            var response = client.PostAsJsonAsync(url + $"/uievent?work={Workspace.desc.id}&board={BoardDesc.id}",
                 new UIEventReq
                 {
                     control = control,

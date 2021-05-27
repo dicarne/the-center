@@ -8,14 +8,14 @@ if __name__ == "__main__":
 class HelloPythonModule(PModule):
 
     @ui
-    def hello():
+    def hello(self):
         return Text("Hello Python!")
     @ui
-    def clickMe():
-        return Button().text("点我Hello").onClick("OnClick")
+    def clickMe(self):
+        return Button().text("点我Hello").onClick(self.OnClick)
     @ui
-    def input1():
-        return Input().placeholder("haha").onChange("OnInput1Change")
+    def input1(self):
+        return Input().placeholder("haha").onChange(self.OnInput1Change)
 
     @data
     def count():
