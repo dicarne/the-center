@@ -37,10 +37,25 @@ namespace TheCenterServer.PModule
             pro.StartInfo.CreateNoWindow = false;
 
             pro.StartInfo.RedirectStandardOutput = true;
+            pro.StartInfo.RedirectStandardError = true;
             pro.OutputDataReceived += (o, e) =>
             {
                 File.AppendAllTextAsync(Path.Combine(config.dir, "log.log"), (e.Data ?? "") + "\n");
+                if(e.Data.HasValue() && !e.Data!.StartsWith("INFO:"))
+                {
+                    Console.WriteLine(e.Data + "\n");
+                }
+                
             };
+            pro.ErrorDataReceived += (o, e) =>
+            {
+                File.AppendAllTextAsync(Path.Combine(config.dir, "error.log"), (e.Data ?? "") + "\n");
+                if (e.Data.HasValue() && !e.Data!.StartsWith("INFO:"))
+                {
+                    Console.WriteLine(e.Data + "\n");
+                }
+            };
+
             if (config.singleton)
             {
                 childrens.Add(config.type, new ChildModule()

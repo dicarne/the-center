@@ -14,18 +14,18 @@ class UICom:
     style: Dict[str, str]
     prop: Dict[str, str]
     event: List[str]
-    def __init__(self, type, id) -> None:
+    def __init__(self, type) -> None:
         self.style = {}
         self.prop = {}
         self.event = []
-        self.id = id
         self.type = type
+    
 
 class UIBase:
     ui: UICom
     events: Dict[str, str]
-    def __init__(self, type, id) -> None:
-        self.ui = UICom(type, id)
+    def __init__(self, type) -> None:
+        self.ui = UICom(type)
         self.events = {}
     
     def bindEvent(self, eventName, method):
@@ -33,9 +33,12 @@ class UIBase:
             self.ui.event.append(eventName)
         self.events[eventName] = method
 
+    def set_id(self, newid):
+        self.ui.id = newid
+
 class Text(UIBase):
-    def __init__(self, id, text) -> None:
-        super().__init__("text", id)
+    def __init__(self, text) -> None:
+        super().__init__("text")
         self.ui.prop['text'] = text
 
     def text(self, content):
@@ -43,8 +46,8 @@ class Text(UIBase):
         return self
 
 class Button(UIBase):
-    def __init__(self, id) -> None:
-        super().__init__("button", id)
+    def __init__(self) -> None:
+        super().__init__("button")
     
     def text(self, content):
         self.ui.prop['text'] = content
@@ -55,8 +58,8 @@ class Button(UIBase):
         return self
 
 class CheckBox(UIBase):
-    def __init__(self, id) -> None:
-        super().__init__("checkBox", id)
+    def __init__(self) -> None:
+        super().__init__("checkBox")
 
     def value(self, v: bool):
         self.ui.prop["value"] = json.dumps(v)
@@ -67,8 +70,8 @@ class CheckBox(UIBase):
         return self
 
 class Group(UIBase):
-    def __init__(self, id) -> None:
-        super().__init__("group", id)
+    def __init__(self) -> None:
+        super().__init__("group")
     
     def children(self, childs: List[UICom]):
         self.ui.prop["children"] = json.dumps(childs)
@@ -85,8 +88,8 @@ class Group(UIBase):
         self.ui.prop["spacing"] = json.dumps(s)
 
 class Input(UIBase):
-    def __init__(self, id) -> None:
-        super().__init__("input", id)
+    def __init__(self) -> None:
+        super().__init__("input")
     
     def text(self, content):
         self.ui.prop['text'] = content
@@ -101,8 +104,8 @@ class Input(UIBase):
         return self
 
 class More(UIBase):
-    def __init__(self, id) -> None:
-        super().__init__("more", id)
+    def __init__(self) -> None:
+        super().__init__("more")
 
     def text(self, content):
         self.ui.prop['text'] = content
@@ -117,8 +120,8 @@ class More(UIBase):
         return self
 
 class Transfer(UIBase):
-    def __init__(self, id) -> None:
-        super().__init__("transfer", id)
+    def __init__(self) -> None:
+        super().__init__("transfer")
 
     def onChange(self, onchange: str):
         self.bindEvent("onChange", onchange)

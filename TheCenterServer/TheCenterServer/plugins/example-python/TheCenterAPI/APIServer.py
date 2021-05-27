@@ -23,10 +23,11 @@ class PModule:
     workspaceID: str
     board: BoardDesc
     values: Dict[str, Any] = {}
+    _uis: Dict[str, UIBase] = {}
 
     def HandleUIEvent(self, body: UIEventReqBody):
-        if hasattr(self, body.control):
-            ui = getattr(self, body.control)
+        if body.control in self._uis:
+            ui = self._uis[body.control]
             if body.args:
                 getattr(self, ui.events[body.eventname])(*body.args)
             else:
@@ -40,7 +41,7 @@ class PModule:
     def customEvent(self, control, eventname, args):
         pass
 
-    def getValue(self, key: str, force: bool = False):
+    def _getValue(self, key: str, force: bool = False):
         # if not force:
         #    if key in self.values:
         #        return self.values[key]
@@ -50,7 +51,7 @@ class PModule:
         self.values[key] = json.loads(v)
         return self.values[key]
 
-    def setValue(self, key: str, value: Any):
+    def _setValue(self, key: str, value: Any):
         req = requests.post(URL+"SetValue?work="+self.workspaceID +
                             "&board="+self.board.id+"&key="+key, json={"value": json.dumps(value)})
         self.values[key] = value
@@ -68,6 +69,36 @@ class PModule:
     def onLoad(self):
         pass
 
+def data(func):
+    name = func.__name__
+    def getv(self2: PModule):
+        return self2._getValue(name)
+    def setv(self2: PModule, newv):
+        self2._setValue(name, newv)
+    def delv(self2):
+        pass
+    return property(getv, setv, delv, name)
+
+def ui(initfunc):
+    name = initfunc.__name__
+    def getv(self2: PModule):
+        if name in self2._uis:
+            return self2._uis[name]
+        else:
+            init = initfunc()
+            init.set_id(name)
+            self2._uis[name] = init
+            return init
+    def setv(self2: PModule, newv):
+        if name in self2._uis:
+            self2._uis[name] = newv
+        else:
+            init = initfunc()
+            init.set_id(name)
+            self2._uis[name] = newv
+    def delv(self2):
+        pass
+    return property(getv, setv, delv, name)
 
 class WorlspaceIns:
     workspace: WorkspaceDesc
