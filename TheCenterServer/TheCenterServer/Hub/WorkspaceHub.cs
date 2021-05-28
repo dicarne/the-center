@@ -170,6 +170,24 @@ namespace TheCenterServer
             });
         }
         public string Config_GetDBPath() => WorkspaceManager.DBPath;
+
+        public Dictionary<string, string> GetWorkspaceGlobalVariables(string workspace)
+        {
+            return ModuleManager.Ins.WorkspaceManager.Get(workspace).desc.globalVariables;
+        }
+
+        public void SetWorkspaceGlobalVariables(string work, string[][] variables)
+        {
+            var wk = ModuleManager.Ins.WorkspaceManager.Get(work);
+            var old = wk.desc.globalVariables;
+            old.Clear();
+            foreach (var item in variables)
+            {
+                if (!old.ContainsKey(item[0]))
+                    old.Add(item[0], item[1]);
+            }
+            WorkspaceManager.Ins.Save();
+        }
     }
 
     public class WorkspaceBackgroundService : IHostedService

@@ -5,7 +5,7 @@
         <div style="margin-top: 5px;">
             <BoardElement
                 v-for="ui in uIComs"
-                :key="ui.id + ver"
+                :key="ui.id"
                 :ui="ui"
                 :workspace="workspace"
                 :board="boardid"
@@ -14,7 +14,7 @@
             />
         </div>
     </div>
-    <a-dropdown :trigger="['click']" class="close-pos">
+    <a-dropdown placement="bottomRight" :trigger="['click']" class="close-pos">
         <a class="ant-dropdown-link" @click.prevent>
             <DownOutlined />
         </a>
@@ -40,7 +40,7 @@
     </a-modal>
 </template>
 <script lang="ts">
-import { computed, createVNode, defineComponent, inject, PropType, reactive, Ref, ref, watch } from "vue";
+import { computed, createVNode, defineComponent, inject, PropType, reactive, Ref, ref, watch, watchEffect } from "vue";
 import { BoardUI, DeleteBoard, RenameBoard, SetBoardGroup, UICom, WorkspaceDesc } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -143,6 +143,7 @@ export default defineComponent({
             return ""
 
         })
+
         return {
             onClick, title, menuVisiable, rename, rename_value, setGroupOk, new_group, env: prop.environment, boardColor: boardColor
         }

@@ -9,6 +9,7 @@ namespace TheCenterServer
         public string id { get; set; }
         public List<BoardDesc> boards { get; set; } = new();
         public List<GroupBoardColor> groups { get; set; } = new();
+        public Dictionary<string, string> globalVariables { get; set; } = new();
     }
 
     public class GroupBoardColor

@@ -26,6 +26,7 @@ namespace TheCenterServer.Controllers
         {
             public List<string[]> value { get; set; }
         }
+
         [HttpPost]
         public void EnsureValue(string work, string board, EnsureValueBody keybody)
         {
@@ -72,6 +73,12 @@ namespace TheCenterServer.Controllers
         {
             var m = WorkspaceManager.Ins.Get(work).modules.Find(b => b.ID == board) as PluginModule;
             return m.BoardDesc;
+        }
+
+        [HttpGet]
+        public Dictionary<string, string> GetGlobalVariable(string work)
+        {
+            return WorkspaceManager.Ins.Get(work).desc.globalVariables;
         }
     }
 }

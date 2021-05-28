@@ -187,3 +187,12 @@ export async function Config_SetDBPath(id: string) {
     "Config_GetDBPath"
   )) as string
 }
+
+//
+
+export async function GetWorkspaceGlobalVariables(workspace: string) {
+  return (await connection.invoke("GetWorkspaceGlobalVariables", workspace))
+}
+export async function SetWorkspaceGlobalVariables(workspace: string, values: string[][]) {
+  return (await connection.invoke("SetWorkspaceGlobalVariables", workspace, values))
+}

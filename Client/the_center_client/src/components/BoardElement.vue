@@ -4,8 +4,8 @@
             v-if="ui.type === 'transfer'"
             @click="transfer.open"
             :style="uiStyle"
-        >{{ textvalue }}</a-button>
-        <a-button v-if="ui.type === 'button'" @click="click" :style="uiStyle">{{ textvalue }}</a-button>
+        >{{ prop.ui.prop.text }}</a-button>
+        <a-button v-if="ui.type === 'button'" @click="click" :style="uiStyle">{{ prop.ui.prop.text }}</a-button>
         <a-checkbox
             v-if="ui.type === 'checkBox'"
             v-model:checked="checkBoxValue"
@@ -20,9 +20,9 @@
         >
             <UpOutlined v-if="uiProp.isshow" />
             <DownOutlined v-if="!uiProp.isshow" />
-            {{ " " + textvalue }}
+            {{ " " + prop.ui.prop.text }}
         </a>
-        <p v-if="ui.type === 'text'" class="text" :style="uiStyle">{{ textvalue }}</p>
+        <p v-if="ui.type === 'text'" class="text" :style="uiStyle">{{ prop.ui.prop.text }}</p>
         <a-input
             v-if="ui.type === 'input'"
             v-model:value="textvalue"

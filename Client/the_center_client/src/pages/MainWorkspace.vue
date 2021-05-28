@@ -4,14 +4,26 @@
             <a-col span="6">
                 <a-input v-model:value="env.wName" @change="renameWorkspace" />
             </a-col>
-            <a-col span="6">
+            <a-col span="3">
                 <a-button @click="getboard">刷新</a-button>
             </a-col>
-            <a-col span="6">
+            <a-col span="3">
                 <a-button @click="openSortBoards">排序</a-button>
             </a-col>
-            <a-col span="6">
+            <a-col span="3">
                 <a-button @click="deleteWorkspace">删除</a-button>
+            </a-col>
+            <a-col span="9">
+                <a-dropdown placement="bottomRight">
+                    <a-button @click.prevent>更多</a-button>
+                    <template #overlay>
+                        <a-menu @click="onMoreMenuClick">
+                            <a-menu-item key="setvariable">
+                                <p>设置环境变量</p>
+                            </a-menu-item>
+                        </a-menu>
+                    </template>
+                </a-dropdown>
             </a-col>
         </a-row>
     </div>
@@ -53,17 +65,36 @@
             </template>
         </draggable>
     </a-modal>
+    <a-modal title="设置环境变量" v-model:visible="menu.setvairable.visiable" @ok="menu.setvairable.ok">
+        <a-col>
+            <a-row v-for="item in menu.setvairable.value">
+                <a-col :span="10">
+                    <a-input v-model:value="item.value[0]"></a-input>
+                </a-col>
+                <a-col :span="10">
+                    <a-input v-model:value="item.value[1]"></a-input>
+                </a-col>
+                <a-col :span="4">
+                    <a-button @click="menu.setvairable.deleteLine(item)">删除</a-button>
+                </a-col>
+            </a-row>
+            <a-row>
+                <a-button @click="menu.setvairable.newline">新增</a-button>
+            </a-row>
+        </a-col>
+    </a-modal>
 </template>
 
 <script lang="ts">
 import { createVNode, defineComponent, onMounted, onUnmounted, PropType, provide, reactive, ref } from "vue";
 import { Row, Col, Modal } from "ant-design-vue";
-import { BoardUI, CreateBoard, DeleteWorkspace, FocusWorkspace, GetAllBoardTypes, GetBoards, ModuleTypeNamePair, onConnected, RenameWorkspace, SortBoards, WorkspaceDesc } from "../api/workspace";
+import { BoardUI, CreateBoard, DeleteWorkspace, FocusWorkspace, GetAllBoardTypes, GetBoards, GetWorkspaceGlobalVariables, ModuleTypeNamePair, onConnected, RenameWorkspace, SetWorkspaceGlobalVariables, SortBoards, WorkspaceDesc } from "../api/workspace";
 import BoardElement from "../components/BoardElement.vue"
 import BoardCard from "./BoardCard.vue"
 import { workspaces } from "../connection/Server"
 import draggable from 'vuedraggable'
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { v4 } from "uuid"
 
 export default defineComponent({
     components: {
@@ -91,13 +122,13 @@ export default defineComponent({
         }
     },
     setup: (prop) => {
-        const list = reactive({boards: [] as BoardUI[]});
+        const list = reactive({ boards: [] as BoardUI[] });
 
         const workspaceObj = ref(prop.workspaceObj)
         provide("workspace", workspaceObj)
 
         const getboard = async () => {
-            list.boards = (await GetBoards(prop.workspace)).filter(b => !b.hide);
+            list.boards = reactive((await GetBoards(prop.workspace)).filter(b => !b.hide));
             list.boards.forEach(u => { if (u.ver === undefined) u.ver = 0 })
         };
 
@@ -114,7 +145,8 @@ export default defineComponent({
         const dispatchBoard = (board: string, data: string) => {
             let jdata = JSON.parse(data)
             let index = list.boards.findIndex(u => u.id === board)
-            list.boards[index].uIComs = ref(jdata)
+            const ui = list.boards[index]
+            list.boards[index].uIComs = reactive(jdata)
             list.boards[index].ver++
         }
         onMounted(() => {
@@ -186,9 +218,47 @@ export default defineComponent({
 
         }
         // ------
+        const menu = reactive({
+            setvairable: {
+                visiable: false,
+                ok: async () => {
+                    await SetWorkspaceGlobalVariables(prop.workspace, menu.setvairable.value.map(v => v.value))
+                    menu.setvairable.visiable = false;
+                },
+                value: [] as { key: string, value: string[] }[],
+                newline: () => {
+                    menu.setvairable.value.push({ key: v4(), value: ["", ""] })
+                },
+                deleteLine: (item: { key: string, value: string[] }) => {
+                    const ind = menu.setvairable.value.findIndex(i => i.key === item.key)
+                    menu.setvairable.value.splice(ind, 1)
+                }
+            }
+        })
+        const onMoreMenuClick = async (e: { key: string }) => {
+
+            switch (e.key) {
+                case "setvariable":
+                    var vs = await GetWorkspaceGlobalVariables(prop.workspace)
+                    menu.setvairable.value = []
+                    for (let o in vs) {
+                        const v = vs[o]
+                        menu.setvairable.value.push({
+                            key: v4(),
+                            value: [o, v]
+                        })
+                    }
+                    menu.setvairable.visiable = true;
+                    break;
+
+                default:
+                    break;
+            }
+        }
         return {
             getboard, list, createBoard, workspace: prop.workspace, newcard_visiable, newcard_ok, createCard, openSortBoards, sortBoards, sort_drag,
-            b_openSortBoards, borderOrder, env: prop.workspaceObj, renameWorkspace, deleteWorkspace
+            b_openSortBoards, borderOrder, env: prop.workspaceObj, renameWorkspace, deleteWorkspace,
+            onMoreMenuClick, menu
         };
     },
 });

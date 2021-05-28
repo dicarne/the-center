@@ -164,7 +164,15 @@ namespace TheCenterServer.PModule
                     args = args
                 }
             );
+            OnGlobalVariableChange();
             return null;
+        }
+
+        public override void OnGlobalVariableChange()
+        {
+            client.PostAsJsonAsync(url + $"/globalvariable?work={Workspace.desc.id}",
+                Workspace.desc.globalVariables
+            );
         }
     }
 }

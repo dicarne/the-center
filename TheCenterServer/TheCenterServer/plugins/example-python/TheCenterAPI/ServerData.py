@@ -20,3 +20,4 @@ class WorkspaceDesc:
     id: str
     boards: List[BoardDesc] = []
     groups: List[GroupBoardColor] = []
+    globalVariables: Dict[str, str] = {}

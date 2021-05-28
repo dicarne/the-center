@@ -70,6 +70,24 @@ class PModule:
     def onLoad(self):
         pass
 
+    def onGlobalVariableChange():
+        pass
+
+    def getGlobalVariable(self, key: str):
+        sp = _workspaces[self.workspaceID]
+        if key not in sp.globalVariables.keys():
+            return None
+        return sp.globalVariables[key]
+
+
+class WorkspaceIns:
+    boards: Dict[str, PModule]
+    globalVariables: Dict[str, str]
+
+    def __init__(self) -> None:
+        self.boards = {}
+        self.globalVariables = {}
+
 
 def data(func):
     name = func.__name__
@@ -111,15 +129,7 @@ def ui(initfunc):
     return property(getv, setv, delv, name)
 
 
-class WorlspaceIns:
-    workspace: WorkspaceDesc
-    boards: Dict[str, PModule]
-
-    def __init__(self) -> None:
-        self.boards = {}
-
-
-_workspaces: Dict[str, WorlspaceIns] = {}
+_workspaces: Dict[str, WorkspaceIns] = {}
 _reg_module: Dict[str, Any] = {}
 
 
@@ -132,7 +142,8 @@ def uievent(body: UIEventReqBody, work: str, board: str):
 @app.post("/init")
 def init(work: str, board: str, boardBody: BoardDesc):
     if work not in _workspaces:
-        _workspaces[work] = WorlspaceIns()
+        _workspaces[work] = WorkspaceIns()
+        _workspaces[work].globalVariables = requests.get(URL+"GetGlobalVariable?work="+work).json()
     wk = _workspaces[work]
     if board not in wk.boards:
         wk.boards[board] = _reg_module["#"]()
@@ -155,6 +166,14 @@ def interface(work: str, board: str):
     ensure_active(work, board)
     return _workspaces[work].boards[board].buildInterface()
 
+
+@app.post("/globalvariable")
+def globalVariable(work: str, variables: Dict[str, str]):
+    _workspaces[work].globalVariables = variables
+    for _, m in _workspaces[work].boards.items():
+        m.onGlobalVariableChange()
+
+
 def ensure_active(work: str, board: str):
     if work not in _workspaces or board not in _workspaces[work].boards:
         req = requests.get(URL+"GetBoardDesc?work="+work +
@@ -172,8 +191,10 @@ def ensure_active(work: str, board: str):
         init(work, board, desc)
         _workspaces[work].boards[board].buildInterface()
 
+
 def reg_module(typeName: str, type):
     _reg_module[typeName] = type
+
 
 def Module(module: PModule):
     def moduleName(name):
@@ -181,7 +202,7 @@ def Module(module: PModule):
         return module
     return moduleName
 
+
 def Module(module: PModule):
     reg_module("#", module)
     return module
-

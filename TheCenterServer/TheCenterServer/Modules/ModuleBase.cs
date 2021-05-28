@@ -248,6 +248,10 @@ namespace TheCenterServer.PModule
             }
         }
 
+        public virtual void OnGlobalVariableChange()
+        {
+
+        }
     }
 
     [System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
