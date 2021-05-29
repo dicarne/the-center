@@ -205,6 +205,7 @@ namespace TheCenterServer
                 modules.Add(m);
                 m.BoardDesc = b;
                 m.Recovery();
+                m.SetDefaultSize();
                 m.OnLoad();
             }
         }
@@ -226,6 +227,7 @@ namespace TheCenterServer
                 desc.boards.Add(b);
                 m.BoardDesc = b;
                 m.OnFirstCreate();
+                m.SetDefaultSize();
                 m.OnLoad();
                 m.Save();
                 ModuleManager.Ins.WorkspaceManager.Save();

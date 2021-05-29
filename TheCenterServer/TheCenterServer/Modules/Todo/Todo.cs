@@ -112,9 +112,17 @@ namespace TheCenterServer.PModule
             }
         }
 
-        public override Task OnLoad()
+        public override void SetDefaultSize()
         {
             BoardDesc.w = 11;
+            BoardDesc.breakpointH["xs"] = 24;
+            BoardDesc.breakpointH["sm"] = 18;
+            BoardDesc.breakpointH["md"] = 12;
+            BoardDesc.breakpointH["xl"] = 11;
+        }
+
+        public override Task OnLoad()
+        {
             return base.OnLoad();
         }
     }

@@ -29,12 +29,21 @@
     </div>
 
     <Row :gutter="[16, 16]">
-        <Col :span="6">
+        <Col :span="6" :xs="24" :sm="12" :md="8" :lg="6">
             <div class="card-board card-body">
                 <a-button @click="createBoard" style="margin-top: 15%;">+</a-button>
             </div>
         </Col>
-        <Col v-for="item in list.boards" :key="item.id" :span="item.w">
+        <Col
+            v-for="item in list.boards"
+            :key="item.id"
+            :span="item.w"
+            :xs="item.breakpointH['xs']"
+            :sm="item.breakpointH['sm']"
+            :md="item.breakpointH['md']"
+            :lg="item.breakpointH['lg']"
+            :xl="item.breakpointH['xl']"
+        >
             <BoardCard
                 :ver="item.ver"
                 :u-i-coms="item.uIComs"

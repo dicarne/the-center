@@ -14,6 +14,7 @@ class BoardDesc(BaseModel):
     w: int = 6
     h: int = 1
     hide: bool = False
+    breakpointH: Dict[str, int]
 
 class WorkspaceDesc:
     wName: str

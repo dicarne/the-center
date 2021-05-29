@@ -252,6 +252,14 @@ namespace TheCenterServer.PModule
         {
 
         }
+
+        public virtual void SetDefaultSize()
+        {
+            BoardDesc.breakpointH["xs"] = 24;
+            BoardDesc.breakpointH["sm"] = 12;
+            BoardDesc.breakpointH["md"] = 8;
+            BoardDesc.breakpointH["lg"] = 6;
+        }
     }
 
     [System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]

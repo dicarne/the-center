@@ -34,6 +34,7 @@ namespace TheCenterServer
         public int w { get; set; } = 6;
         public int h { get; set; } = 1;
         public bool hide { get; set; } = false;
+        public Dictionary<string, int> breakpointH { get; set; } = new();
     }
 
     public class BoardUI : BoardDesc
@@ -50,7 +51,8 @@ namespace TheCenterServer
                 prop = desc.prop,
                 w = desc.w,
                 uIComs = uis,
-                group = desc.group
+                group = desc.group,
+                breakpointH = desc.breakpointH ?? new()
             };
             return bd;
         }

@@ -151,6 +151,7 @@ export interface Board {
   h: number;
   id: string;
   group?: string
+  breakpointH: Record<string, number>
 }
 export interface WorkspaceDesc {
   wName: string;
