@@ -1,11 +1,11 @@
 <template>
-    <div :class="prop.deep === 0 ? 'board-element' : ''">
+    <div :class="deep === 0 ? 'board-element' : ''">
         <a-button
             v-if="ui.type === 'transfer'"
             @click="transfer.open"
-            :style="uiStyle"
-        >{{ prop.ui.prop.text }}</a-button>
-        <a-button v-if="ui.type === 'button'" @click="click" :style="uiStyle">{{ prop.ui.prop.text }}</a-button>
+            :style="ui.style"
+        >{{ ui.prop.text }}</a-button>
+        <a-button v-if="ui.type === 'button'" @click="click" :style="ui.style">{{ ui.prop.text }}</a-button>
         <a-checkbox
             v-if="ui.type === 'checkBox'"
             v-model:checked="checkBoxValue"
@@ -16,38 +16,38 @@
             @click="click"
             class="ant-dropdown-link"
             href="javascript:;"
-            :style="uiStyle"
+            :style="ui.style"
         >
-            <UpOutlined v-if="uiProp.isshow" />
-            <DownOutlined v-if="!uiProp.isshow" />
-            {{ " " + prop.ui.prop.text }}
+            <UpOutlined v-if="ui.prop.isshow === 'true'" />
+            <DownOutlined v-if="ui.prop.isshow === 'false'" />
+            {{ " " + ui.prop.text }}
         </a>
-        <p v-if="ui.type === 'text'" class="text" :style="uiStyle">{{ prop.ui.prop.text }}</p>
+        <p v-if="ui.type === 'text'" class="text" :style="ui.style">{{ ui.prop.text }}</p>
         <a-input
             v-if="ui.type === 'input'"
             v-model:value="textvalue"
             @change="onTextChange"
-            :placeholder="uiProp['placeholder']"
-            :style="uiStyle"
+            :placeholder="ui.prop['placeholder']"
+            :style="ui.style"
         ></a-input>
         <div v-if="ui.type === 'group'">
             <a-row
-                v-if="uiProp['hor'] == 'true'"
+                v-if="ui.prop['hor'] == 'true'"
                 :align="'middle'"
-                :gutter="JSON.parse(uiProp['spacing'] || '0')"
+                :gutter="JSON.parse(ui.prop['spacing'] || '0')"
             >
                 <a-col
-                    v-for="ui in groupComs"
-                    :span="ui.prop['span'] ? JSON.parse(uiProp['span']) : undefined"
-                    :flex="ui.prop['flex']"
+                    v-for="cui in groupComs"
+                    :span="cui.prop['span'] ? JSON.parse(ui.prop['span']) : undefined"
+                    :flex="cui.prop['flex']"
                 >
                     <BoardElement
-                        :key="ui.id"
-                        :ui="ui"
+                        :key="cui.id"
+                        :ui="cui"
                         :workspace="workspace"
-                        :board="prop.board"
-                        :environment="prop.environment"
-                        :deep="prop.deep + 1"
+                        :board="board"
+                        :environment="environment"
+                        :deep="deep + 1"
                     />
                 </a-col>
             </a-row>
@@ -57,9 +57,9 @@
                     :key="ui.id"
                     :ui="ui"
                     :workspace="workspace"
-                    :board="prop.board"
-                    :environment="prop.environment"
-                    :deep="prop.deep + 1"
+                    :board="board"
+                    :environment="environment"
+                    :deep="deep + 1"
                 />
             </div>
         </div>
@@ -78,7 +78,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, reactive, ref } from "vue";
+import { defineComponent, PropType, reactive, ref, toRaw, watchEffect } from "vue";
 import { BoardUI, HandleBoardUIEvent, UICom } from "../api/workspace"
 import { DownOutlined, UpOutlined } from '@ant-design/icons-vue';
 
@@ -90,7 +90,7 @@ export default defineComponent({
     name: "BoardElement",
     props: {
         ui: {
-            type: Object,
+            type: Object as PropType<UICom>,
             required: true
         },
         workspace: {
@@ -111,17 +111,22 @@ export default defineComponent({
         },
     },
     setup: (prop) => {
-        const ui = prop.ui as UICom
+        const id = prop.ui.id
+        const type = prop.ui.type
+
         const click = async () => {
-            const ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onClick')
+            const ret = await HandleBoardUIEvent(prop.workspace, prop.board, id, 'onClick')
         }
 
-        const uiProp = (ui as any).prop as any
-        const uiStyle = (ui as any).style as any
+        const textvalue = ref(prop.ui.prop['text'] as string)
+        watchEffect(() => {
+            if (textvalue.value != prop.ui.prop['text']) {
+                textvalue.value = prop.ui.prop['text']
+            }
 
-        const textvalue = ref(uiProp['text'])
+        })
         const onTextChange = async () => {
-            await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, 'onChange', [textvalue.value])
+            await HandleBoardUIEvent(prop.workspace, prop.board, id, 'onChange', [textvalue.value])
         }
 
         // Transfer
@@ -129,19 +134,19 @@ export default defineComponent({
             open_stat: false,
             open: async () => {
                 transfer.open_stat = true
-                var ret = await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, "onShow")
+                var ret = await HandleBoardUIEvent(prop.workspace, prop.board, id, "onShow")
                 transfer.tar = ret.ava
                 transfer.list = prop.environment.boards.map(it => { return { ...it, key: it.id, title: it.cName, disabled: it.id === prop.board } })
             },
             comfirm: async () => {
                 transfer.open_stat = false;
-                await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, "onChange", [JSON.stringify(transfer.tar), "[]"])
+                await HandleBoardUIEvent(prop.workspace, prop.board, id, "onChange", [JSON.stringify(transfer.tar), "[]"])
             },
             list: prop.environment.boards.map(it => { return { ...it, key: it.id, title: it.cName, disabled: it.id === prop.board } }),
             tar: [] as string[],
             select: [] as string[],
             render: (k: BoardUI) => {
-                switch (uiProp['type']) {
+                switch (prop.ui.prop.type) {
                     case 'local_boards':
 
                         break;
@@ -158,24 +163,27 @@ export default defineComponent({
                 transfer.select = [...sourceSelectedKeys, ...targetSelectedKeys];
             }
         })
-        if (ui.type === "more") {
-            uiProp.isshow = JSON.parse(uiProp.isshow)
-        }
+
         const groupComs = ref<UICom[] | null>(null)
-        if (ui.type === "group") {
-            groupComs.value = JSON.parse(uiProp["children"])
+        if (type === "group") {
+            watchEffect(() => {
+                groupComs.value = reactive(JSON.parse(prop.ui.prop["children"]))
+            })
+
         }
         // --------
         const checkBoxValue = ref(false)
-        if (ui.type === "checkBox") {
-            checkBoxValue.value = uiProp["value"] === "true" ? true : false
+        if (type === "checkBox") {
+            watchEffect(() => {
+                checkBoxValue.value = prop.ui.prop["value"] === "true" ? true : false
+            })
+
         }
         const checkBoxChange = async () => {
-            await HandleBoardUIEvent(prop.workspace, prop.board, ui.id, "onChange", [JSON.stringify(checkBoxValue.value)])
+            await HandleBoardUIEvent(prop.workspace, prop.board, id, "onChange", [JSON.stringify(checkBoxValue.value)])
         }
-        //console.log(uiProp)
         // --------
-        return { prop, ui, click, textvalue, onTextChange, uiProp, uiStyle, transfer, groupComs, checkBoxValue, checkBoxChange }
+        return { click, textvalue, onTextChange, transfer, groupComs, checkBoxValue, checkBoxChange }
     },
 })
 </script>

@@ -17,7 +17,7 @@ class HelloPythonModule(PModule):
         return Button().text("点我Hello").onClick(self.OnClick)
 
     @ui
-    def input1(self):
+    def input1(self) -> Input:
         return Input().placeholder("输入环境变量名").onChange(self.OnInput1Change)
 
     @ui
@@ -36,6 +36,7 @@ class HelloPythonModule(PModule):
         super().__init__()
 
     def buildInterface(self):
+        self.isKnown()
         self.hello.text(str(self.count))
         self.input1.text(self.inputtext)
         
@@ -56,12 +57,16 @@ class HelloPythonModule(PModule):
 
     def OnInput1Change(self, newtext: str):
         self.inputtext = newtext
+        self.syncUI()
+    
+    def isKnown(self):
         glo = self.getGlobalVariable(self.inputtext)
         if glo is not None:
             self.showVariable.text(glo)
+            return True
         else:
             self.showVariable.text("未知")
-        self.syncUI()
+            return False
 
     def onLoad(self):
         self.ensureValue([["count", 0], ["inputtext", ""]])
