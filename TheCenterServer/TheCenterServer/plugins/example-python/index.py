@@ -1,5 +1,4 @@
-import fastapi
-from TheCenterAPI.APIServer import Module, PModule, Run, data, reg_module, ui
+from TheCenterAPI.APIServer import Module, PModule, Run, data, ui
 from TheCenterAPI.BaseUICom import Button, Input, Text
 
 if __name__ == "__main__":
@@ -55,14 +54,13 @@ class HelloPythonModule(PModule):
     def customEvent(self, control, eventname, args):
         pass
 
-    def OnInput1Change(self, newtext):
+    def OnInput1Change(self, newtext: str):
         self.inputtext = newtext
         glo = self.getGlobalVariable(self.inputtext)
         if glo is not None:
             self.showVariable.text(glo)
         else:
             self.showVariable.text("未知")
-
         self.syncUI()
 
     def onLoad(self):

@@ -1,5 +1,5 @@
 from TheCenterAPI.ServerData import BoardDesc, WorkspaceDesc
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, TypeVar
 from TheCenterAPI.BaseUICom import UIBase, UIEventReqBody
 from fastapi import FastAPI
 import uvicorn
@@ -42,7 +42,7 @@ class PModule:
     def buildInterface(self):
         pass
 
-    def customEvent(self, control, eventname, args):
+    def customEvent(self, control: str, eventname: str, args: List[Any]):
         pass
 
     def _getValue(self, key: str, force: bool = False):
@@ -88,8 +88,8 @@ class WorkspaceIns:
         self.boards = {}
         self.globalVariables = {}
 
-
-def data(func):
+T = TypeVar('T')
+def data(func: Callable[[], T]) -> T:
     name = func.__name__
 
     def getv(self2: PModule):
@@ -103,7 +103,7 @@ def data(func):
     return property(getv, setv, delv, name)
 
 
-def ui(initfunc):
+def ui(initfunc: Callable[[], T]) -> T:
     name = initfunc.__name__
 
     def getv(self2: PModule):
