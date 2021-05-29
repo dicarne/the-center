@@ -64,7 +64,6 @@ namespace TheCenterServer.PModule
 
         public override void OnCustomEvent(string control, string eventName, string[]? args = null)
         {
-            Console.WriteLine($"ctrl: {control}, event: {eventName}");
             if (control.StartsWith("t:"))
             {
                 var id = control.Substring(2);

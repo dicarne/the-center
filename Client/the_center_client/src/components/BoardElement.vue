@@ -119,12 +119,12 @@ export default defineComponent({
         }
 
         const textvalue = ref(prop.ui.prop['text'] as string)
-        watchEffect(() => {
-            if (textvalue.value != prop.ui.prop['text']) {
-                textvalue.value = prop.ui.prop['text']
-            }
-
-        })
+        //watchEffect(() => {
+        //    if (textvalue.value != prop.ui.prop['text']) {
+        //        textvalue.value = prop.ui.prop['text']
+        //    }
+//
+        //})
         const onTextChange = async () => {
             await HandleBoardUIEvent(prop.workspace, prop.board, id, 'onChange', [textvalue.value])
         }

@@ -28,7 +28,7 @@ app.whenReady().then(() => {
 
 const exec = require('child_process').exec;
 
-const serverpath = `${isDebug ? __dirname : process.resourcesPath}/server/TheCenterServer.exe --dbpath D:/centerLib.db`
+const serverpath = `${isDebug ? __dirname : process.resourcesPath}/server/TheCenterServer.exe`
 const server = exec(serverpath, function (err, data) { if (err) { throw err; } console.log(data.toString()); });
 
 
