@@ -22,3 +22,6 @@ Client目录为前端UI代码，Server目录为后端服务器代码。
 3.  提交代码
 4.  新建 Pull Request
 
+## 仓库
+Gitee: https://gitee.com/dicarne/the-center  
+Github: https://github.com/dicarne/the-center
